@@ -56,21 +56,13 @@ class OrderBook extends React.PureComponent {
   }
 
   componentDidMount() {
-    const { setTradeForm } = this.props;
     const commonOptions = this.getCommonOptions();
-
     let needScrollMiddle = true;
     const tryScrollToMiddel = () => {
-      if (!this.orderbookContainer) {
+      if (!this.orderbookContainer || !needScrollMiddle) {
         return;
       }
-
-      if (!needScrollMiddle) {
-        return;
-      }
-
       const ref = this.orderbookContainer;
-
       ref.scrollTop = commonOptions.height - ref.parentElement.clientHeight / 2 + 20;
       if (ref.scrollTop === 0) {
         return;
@@ -83,14 +75,6 @@ class OrderBook extends React.PureComponent {
       drawFromBottom: true,
       side: 'sell',
       priceColor: '#ee494c',
-      onClick: result => {
-        setTradeForm({
-          side: result.clickOnPriceSide ? 'sell' : 'buy',
-          type: 'limit',
-          price: result.price,
-          amount: result.clickOnPriceSide ? null : result.totalAmount
-        });
-      },
       afterDraw: () => {
         tryScrollToMiddel();
       }
@@ -102,14 +86,6 @@ class OrderBook extends React.PureComponent {
       side: 'buy',
       dataOrder: 'desc',
       priceColor: '#41a275',
-      onClick: result => {
-        setTradeForm({
-          side: result.clickOnPriceSide ? 'buy' : 'sell',
-          type: 'limit',
-          price: result.price,
-          amount: result.clickOnPriceSide ? null : result.totalAmount
-        });
-      },
       afterDraw: () => {
         tryScrollToMiddel();
       }
@@ -121,7 +97,6 @@ class OrderBook extends React.PureComponent {
 
   componentDidUpdate(prevProps) {
     const { currentMarket } = this.props;
-
     if (currentMarket !== prevProps.currentMarket) {
       const priceDecimals = currentMarket.priceDecimals;
       const amountDecimals = currentMarket.amountDecimals;
@@ -144,6 +119,35 @@ class OrderBook extends React.PureComponent {
       this.asksBook.stop();
     }
   }
+
+  render() {
+    return (
+      <div className="orderbook">
+        <div className="header bg-dark">
+          <div style={{ width: `${this.columnsWidth[0] * 100}%`, textAlign: 'right' }}>Market Size</div>
+          <div style={{ width: `${this.columnsWidth[1] * 100}%`, textAlign: 'right' }}>Price</div>
+          <div style={{ width: `${this.columnsWidth[2] * 100}%`, textAlign: 'right' }}>My Size</div>
+        </div>
+        <div className="orderbookScrollContainer" ref={this.setRef}>
+          <canvas id="asks-orderbook" />
+          {this.renderSpread()}
+          <canvas id="bids-orderbook" />
+        </div>
+      </div>
+    );
+  }
+
+  setRef = ref => {
+    if (!ref) {
+      delete this.orderbookContainer;
+      return;
+    }
+    this.ps = new PerfectScrollbar(ref, {
+      suppressScrollX: true
+    });
+
+    this.orderbookContainer = ref;
+  };
 
   renderSpread() {
     const { spread, currentMarket } = this.props;
@@ -175,35 +179,6 @@ class OrderBook extends React.PureComponent {
     }
 
     this.forceUpdate();
-  };
-
-  render() {
-    return (
-      <div className="orderbook">
-        <div className="header bg-dark">
-          <div style={{ width: `${this.columnsWidth[0] * 100}%`, textAlign: 'right' }}>Market Size</div>
-          <div style={{ width: `${this.columnsWidth[1] * 100}%`, textAlign: 'right' }}>Price</div>
-          <div style={{ width: `${this.columnsWidth[2] * 100}%`, textAlign: 'right' }}>My Size</div>
-        </div>
-        <div className="orderbookScrollContainer" ref={this.setRef}>
-          <canvas id="asks-orderbook" />
-          {this.renderSpread()}
-          <canvas id="bids-orderbook" />
-        </div>
-      </div>
-    );
-  }
-
-  setRef = ref => {
-    if (!ref) {
-      delete this.orderbookContainer;
-      return;
-    }
-    this.ps = new PerfectScrollbar(ref, {
-      suppressScrollX: true
-    });
-
-    this.orderbookContainer = ref;
   };
 }
 
