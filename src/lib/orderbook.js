@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import Emittery from 'emittery';
 import { store } from '../index';
-import { setBestAsk, setBestBid } from '../../actions/orderbooks';
+import { setBestAsk, setBestBid } from '../actions/orderbook';
 
 export const OrderbookEmittery = new Emittery();
 class MemroyOrderbook {
@@ -51,7 +51,7 @@ class MemroyOrderbook {
       return this.asks[0][0];
     }
 
-    return this.bids[0][0].add(this.asks[0][0]).div(2);
+    return this.bids[0][0].plus(this.asks[0][0]).div(2);
   }
 
   getSpread() {
@@ -81,7 +81,7 @@ class MemroyOrderbook {
   getAggregatePrice = (price, side) => {
     return price
       .div(this.aggregation)
-      .round(0, side === 'buy' ? BigNumber.ROUND_FLOOR : BigNumber.ROUND_CEIL)
+      .dp(0, side === 'buy' ? BigNumber.ROUND_FLOOR : BigNumber.ROUND_CEIL)
       .times(this.aggregation);
   };
 
@@ -147,7 +147,7 @@ class MemroyOrderbook {
 
     // tslint:disable-next-line
     for (let i = 0; i < _data.length; i++) {
-      totalAmount = totalAmount.add(_data[i][1]);
+      totalAmount = totalAmount.plus(_data[i][1]);
       rawData.push(_data[i]);
     }
 
@@ -171,9 +171,9 @@ class MemroyOrderbook {
 
   updateTotalAmount = (side, delta) => {
     if (side === 'buy') {
-      this.bidsAmount = this.bidsAmount.add(delta);
+      this.bidsAmount = this.bidsAmount.plus(delta);
     } else {
-      this.asksAmount = this.asksAmount.add(delta);
+      this.asksAmount = this.asksAmount.plus(delta);
     }
   };
 

@@ -22,10 +22,16 @@ const mapStateToProps = state => {
 };
 
 class WebsocketConnector extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.preEvents = [];
+  }
   componentDidMount() {
     const { currentMarket, address, isLoggedIn } = this.props;
     this.connectWebsocket();
-    this.changeMarket(currentMarket.id);
+    if (currentMarket) {
+      this.changeMarket(currentMarket.id);
+    }
 
     if (address && isLoggedIn) {
       this.changeAccount();
@@ -34,7 +40,7 @@ class WebsocketConnector extends React.PureComponent {
 
   componentDidUpdate(prevProps) {
     const { address, currentMarket, isLoggedIn } = this.props;
-    const marketChange = currentMarket.id !== prevProps.currentMarket.id;
+    const marketChange = currentMarket && prevProps.currentMarket && currentMarket.id !== prevProps.currentMarket.id;
     const loggedInChange = isLoggedIn !== prevProps.isLoggedIn;
     const accountChange = address !== prevProps.account;
 
