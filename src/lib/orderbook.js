@@ -2,8 +2,8 @@ import BigNumber from 'bignumber.js';
 import Emittery from 'emittery';
 import { store } from '../index';
 import { setBestAsk, setBestBid } from '../actions/orderbook';
-
 export const OrderbookEmittery = new Emittery();
+
 class MemroyOrderbook {
   aggregatedAsks = [];
   aggregatedBids = [];

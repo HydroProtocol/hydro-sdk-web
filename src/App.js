@@ -6,6 +6,7 @@ import { initWatchers } from './lib/web3';
 import Header from './components/Header';
 import TradeHistory from './components/TradeHistory';
 import WebsocketConnector from './components/WebsocketConnector';
+import OrderBook from './components/Orderbook';
 import './App.scss';
 
 const mapStateToProps = state => {
@@ -44,6 +45,7 @@ class App extends React.PureComponent {
         <div className="row-wrapper">
           <div className="grid border">
             <div className="title border-bottom text-light">Order Book</div>
+            <OrderBook>/</OrderBook>
           </div>
           <div className="grid flex-1 border">
             <div className="title border-bottom text-light">Chart</div>

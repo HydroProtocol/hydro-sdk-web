@@ -1,0 +1,22 @@
+.orderbook {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    .header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        height: 24px;
+        color: #fff;
+        z-index: 10;
+    }
+    .orderbookScrollContainer {
+        height: 100%;
+        overflow: hidden;
+        font-size: 11px;
+        position: relative;
+    }
+}
