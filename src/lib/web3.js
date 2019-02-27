@@ -1,19 +1,78 @@
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
 import { loadAccount, loadAccountBalance } from '../actions/account';
+import env from './env';
 
 export let web3;
 const accountWatchers = new Map();
 
-export const personalSign = (message, account) => {
+const EIP712Domain = [
+  { name: 'name', type: 'string' },
+  { name: 'version', type: 'string' },
+  { name: 'verifyingContract', type: 'address' }
+];
+
+const Order = [
+  { name: 'trader', type: 'address' },
+  { name: 'relayer', type: 'address' },
+  { name: 'baseToken', type: 'address' },
+  { name: 'quoteToken', type: 'address' },
+  { name: 'baseTokenAmount', type: 'uint256' },
+  { name: 'quoteTokenAmount', type: 'uint256' },
+  { name: 'gasTokenAmount', type: 'uint256' },
+  { name: 'data', type: 'bytes32' }
+];
+
+const domain = {
+  name: 'Hydro Protocol',
+  version: '1',
+  verifyingContract: env.HYDRO_PROXY_ADDRESS
+};
+
+const getEIP712Data = order => {
+  return JSON.stringify({
+    types: {
+      EIP712Domain,
+      Order
+    },
+    domain,
+    primaryType: 'Order',
+    message: order
+  });
+};
+
+export const signOrder = async (address, order) => {
+  const data = getEIP712Data(order);
   return new Promise((resolve, reject) => {
-    const callback = (err, signature) => {
+    web3.currentProvider.sendAsync(
+      {
+        method: 'eth_signTypedData_v3',
+        params: [address, data],
+        from: address
+      },
+      function(err, result) {
+        if (err) {
+          return reject(err);
+        } else if (!result) {
+          return reject(new Error('No Result'));
+        } else if (result.error && result.error.message) {
+          return reject(new Error(result.error.message));
+        }
+
+        return resolve(result.result);
+      }
+    );
+  });
+};
+
+export const personalSign = (message, address) => {
+  return new Promise((resolve, reject) => {
+    web3.personal.sign(web3.toHex(message), address, (err, signature) => {
       if (err) {
         return reject(err);
       }
       resolve(signature);
-    };
-    web3.personal.sign(web3.toHex(message), account, callback);
+    });
   });
 };
 

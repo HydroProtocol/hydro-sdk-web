@@ -1,17 +1,24 @@
-export const setBestAsk = ask => {
-  return {
-    type: 'SET_BEST_ASK',
-    payload: {
-      ask
-    }
+export const initOrderbook = (bids, asks) => {
+  return async dispatch => {
+    dispatch({
+      type: 'INIT_ORDERBOOK',
+      payload: {
+        bids,
+        asks
+      }
+    });
   };
 };
 
-export const setBestBid = bid => {
-  return {
-    type: 'SET_BEST_BID',
-    payload: {
-      bid
-    }
+export const updateOrderbook = (side, price, amount) => {
+  return dispatch => {
+    return dispatch({
+      type: 'UPDATE_ORDERBOOK',
+      payload: {
+        side,
+        price,
+        amount
+      }
+    });
   };
 };

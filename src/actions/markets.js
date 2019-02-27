@@ -1,20 +1,6 @@
-import { client } from '../lib/hydro';
 import BigNumber from 'bignumber.js';
 import axios from 'axios';
-
-const baseUrl = client.apiHandler.getApiUrl();
-
-export const listMarkets = () => {
-  return async (dispatch, getState) => {
-    const url = new URL('markets/status', baseUrl);
-    const res = await axios.get(url.toString());
-    const marketStatus = res.data.data.status;
-    return dispatch({
-      type: 'LOAD_MARKET_STATUS',
-      payload: { marketStatus }
-    });
-  };
-};
+import env from '../lib/env';
 
 export const updateCurrentMarket = currentMarket => {
   return async dispatch => {
@@ -27,8 +13,7 @@ export const updateCurrentMarket = currentMarket => {
 
 export const loadMarkets = () => {
   return async (dispatch, getState) => {
-    const url = new URL('markets', baseUrl);
-    const res = await axios.get(url.toString());
+    const res = await axios.get(`${env.API_ADDRESS}/v3/markets`);
     if (res.data.status === 0) {
       const markets = res.data.data.markets;
 
@@ -44,7 +29,7 @@ export const loadMarkets = () => {
 
 export const loadTradeHistory = marketId => {
   return async (dispatch, getState) => {
-    const res = await axios.get(`https://api.ddex.io/v3/markets/${marketId}/trades`);
+    const res = await axios.get(`${env.API_ADDRESS}/v3/markets/${marketId}/trades`);
     const currentMarket = getState().market.getIn(['markets', 'currentMarket']);
     if (currentMarket.id === marketId) {
       return dispatch({

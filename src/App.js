@@ -1,13 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import MarketStatus from './components/MarketStatus';
 import { loadMarkets, loadTradeHistory } from './actions/markets';
 import { initWatchers } from './lib/web3';
 import Header from './components/Header';
 import TradeHistory from './components/TradeHistory';
 import WebsocketConnector from './components/WebsocketConnector';
 import OrderBook from './components/Orderbook';
-import './App.scss';
+import Trade from './components/Trade';
 
 const mapStateToProps = state => {
   return {
@@ -42,31 +41,27 @@ class App extends React.PureComponent {
       <div className="app bg-secondary">
         <WebsocketConnector />
         <Header />
-        <div className="row-wrapper">
+        <div className="flex flex-1">
           <div className="grid border">
-            <div className="title border-bottom text-light">Order Book</div>
-            <OrderBook>/</OrderBook>
+            <div className="title border-bottom text-light">Orderbook</div>
+            <OrderBook />
           </div>
-          <div className="grid flex-1 border">
-            <div className="title border-bottom text-light">Chart</div>
+          <div className="flex-column flex-1">
+            <div className="grid flex-1 border">
+              <div className="title border-bottom text-light">Trade</div>
+              <div className="flex flex-1" style={{ padding: 10 }}>
+                <div className="flex flex-1 col-6">
+                  <Trade />
+                </div>
+              </div>
+            </div>
+            <div className="grid border flex-1">
+              <div className="title border-bottom text-light">Orders</div>
+            </div>
           </div>
-          <div className="grid border">
-            <div className="title border-bottom text-light">Markets</div>
-            <MarketStatus />
-          </div>
-        </div>
-        <div className="row-wrapper">
           <div className="grid border">
             <div className="title border-bottom text-light">Trade History</div>
             <TradeHistory />
-          </div>
-          <div className="grid flex-1 border">
-            <div className="title border-bottom text-light">Trade</div>
-          </div>
-        </div>
-        <div className="row-wrapper">
-          <div className="grid border">
-            <div className="title border-bottom text-light">TradeHistory</div>
           </div>
         </div>
       </div>

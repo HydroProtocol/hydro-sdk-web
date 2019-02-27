@@ -1,11 +1,11 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import BigNumber from 'bignumber.js';
-import PerfectScrollbar from 'perfect-scrollbar';
+import React from "react";
+import { connect } from "react-redux";
+import BigNumber from "bignumber.js";
+import PerfectScrollbar from "perfect-scrollbar";
 
 const mapStateToProps = state => {
   return {
-    tradeHistory: state.market.get('tradeHistory')
+    tradeHistory: state.market.get("tradeHistory")
   };
 };
 
@@ -20,7 +20,10 @@ class TradeHistory extends React.PureComponent {
   render() {
     const { tradeHistory } = this.props;
     return (
-      <div className="trade-history flex-1" ref={ref => this.setRef(ref)}>
+      <div
+        className="trade-history flex-1 relative"
+        ref={ref => this.setRef(ref)}
+      >
         <table className="table table-dark table-hover table-sm">
           <thead>
             <tr>
@@ -31,13 +34,17 @@ class TradeHistory extends React.PureComponent {
           </thead>
           <tbody>
             {tradeHistory.reverse().map(trade => {
-              const colorGreen = trade.side === 'buy';
+              const colorGreen = trade.side === "buy";
               return (
                 <tr key={trade.id}>
                   <td>{new BigNumber(trade.amount).toFixed(5)}</td>
-                  <td className={[colorGreen ? 'text-success' : 'text-danger'].join(' ')}>
+                  <td
+                    className={[
+                      colorGreen ? "text-success" : "text-danger"
+                    ].join(" ")}
+                  >
                     {new BigNumber(trade.price).toFixed(8)}
-                    {trade.side === 'buy' ? (
+                    {trade.side === "buy" ? (
                       <i className="fa fa-arrow-up" aria-hidden="true" />
                     ) : (
                       <i className="fa fa-arrow-down" aria-hidden="true" />

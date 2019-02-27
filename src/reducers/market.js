@@ -1,8 +1,8 @@
 import { Map, List } from 'immutable';
 
 const initialOrderbook = Map({
-  bestBid: null,
-  bestAsk: null
+  bids: List(),
+  asks: List()
 });
 
 const initialState = Map({
@@ -37,6 +37,16 @@ const initialState = Map({
   })
 });
 
+const reverseBigNumberComparator = (a: any, b: any) => {
+  if (a[0].gt(b[0])) {
+    return -1;
+  } else if (a[0].eq(b[0])) {
+    return 0;
+  } else {
+    return 1;
+  }
+};
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'LOAD_MARKETS':
@@ -60,10 +70,27 @@ export default (state = initialState, action) => {
     case 'LOAD_TRADE_HISTORY':
       state = state.set('tradeHistory', List(action.payload.reverse()));
       return state;
-    case 'SET_BEST_ASK':
-      return state.setIn(['orderbook', 'bestAsk'], action.payload.ask);
-    case 'SET_BEST_BID':
-      return state.setIn(['orderbook', 'bestBid'], action.payload.bid);
+    case 'INIT_ORDERBOOK':
+      state = state.setIn(['orderbook', 'bids'], List(action.payload.bids).sort(reverseBigNumberComparator));
+      state = state.setIn(['orderbook', 'asks'], List(action.payload.asks).sort(reverseBigNumberComparator));
+      return state;
+    case 'UPDATE_ORDERBOOK':
+      const side = action.payload.side === 'buy' ? 'bids' : 'asks';
+      const { price, amount } = action.payload;
+      const index = state.getIn(['orderbook', side]).findIndex(priceLevel => priceLevel[0].eq(price));
+
+      if (index >= 0) {
+        if (amount.lte('0')) {
+          state = state.deleteIn(['orderbook', side, index]);
+        } else {
+          state = state.updateIn(['orderbook', side, index], priceLevel => [priceLevel[0], amount]);
+        }
+      } else if (amount.gt('0')) {
+        state = state.updateIn(['orderbook', side], list => list.push([price, amount]));
+      }
+
+      state = state.setIn(['orderbook', side], state.getIn(['orderbook', side]).sort(reverseBigNumberComparator));
+      return state;
     default:
       return state;
   }

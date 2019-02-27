@@ -13,15 +13,59 @@ body {
     height: 100%;
 }
 
-code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+#root {
+    height: 100%;
 }
 
 .flex-1 {
     flex: 1;
+}
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+.flex {
+    display: flex;
+}
+.column-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.relative {
+    position: relative;
     overflow: hidden;
 }
-
 .ps__rail-y {
     display: none;
+}
+.navbar {
+    height: 50px;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    .title {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+    .grid {
+        min-width: 350px;
+        border-radius: 2px;
+        margin: 5px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .form-group {
+        position: relative;
+    }
+    .unit {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
 }

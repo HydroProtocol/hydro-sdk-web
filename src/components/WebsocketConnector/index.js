@@ -2,13 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import BigNumber from 'bignumber.js';
 import { loadAccountJwt } from '../../lib/session';
+import { initOrderbook, updateOrderbook } from '../../actions/orderbook';
+import env from '../../lib/env';
 // import { accountBalanceLoaded } from '@share/actions/accounts';
 import { setConfigs } from '../../actions/config';
 // import { orderUpdate } from '@share/actions/orders';
 // import { loadToken, updateTokenLockedBalances } from '@share/actions/tokens';
 // import { marketTrade, tradeCompleted, tradeUpdate } from '@share/actions/trades';
 // import { updateCommonTransaction } from '@share/actions/transactions';
-import { OrderbookEmittery } from '../../lib/orderbook';
 // import { apiVersion } from '@share/api';
 import { sleep } from '../../lib/utils';
 
@@ -143,7 +144,7 @@ class WebsocketConnector extends React.PureComponent {
 
   connectWebsocket = () => {
     const { dispatch } = this.props;
-    this.socket = new window.ReconnectingWebSocket(`wss://ws.ddex.io/v3`);
+    this.socket = new window.ReconnectingWebSocket(`${env.WS_ADDRESS}/v3`);
     this.socket.debug = false;
     this.socket.timeoutInterval = 5400;
     this.socket.onopen = async event => {
@@ -178,30 +179,17 @@ class WebsocketConnector extends React.PureComponent {
           if (data.marketId !== currentMarket.id) {
             break;
           }
-
           const bids = data.bids.map(priceLevel => [new BigNumber(priceLevel.price), new BigNumber(priceLevel.amount)]);
           const asks = data.asks.map(priceLevel => [new BigNumber(priceLevel.price), new BigNumber(priceLevel.amount)]);
-
-          OrderbookEmittery.emit('level2OrderbookSnapshot', {
-            bids,
-            asks,
-            marketId: data.marketId,
-            aggregation: new BigNumber(0.1).pow(currentMarket.priceDecimals).toString()
-          });
+          dispatch(initOrderbook(bids, asks));
           break;
         case 'level2OrderbookUpdate':
           if (data.marketId !== currentMarket.id) {
             break;
           }
           data.changes.forEach(change => {
-            OrderbookEmittery.emit('level2OrderbookUpdate', {
-              side: change.side,
-              price: new BigNumber(change.price),
-              amount: new BigNumber(change.amount),
-              marketId: data.marketId
-            });
+            dispatch(updateOrderbook(change.side, new BigNumber(change.price), new BigNumber(change.amount)));
           });
-
           break;
         case 'orderUpdate':
           if (data.order.marketId !== currentMarket.id) {

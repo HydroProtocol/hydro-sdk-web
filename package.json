@@ -6,8 +6,9 @@
     "@hydro-protocol/sdk": "^2.0.4",
     "axios": "^0.18.0",
     "bignumber.js": "^8.1.1",
-    "bootstrap": "^4.3.1",
     "bufferutil": "^4.0.1",
+    "dotenv": "^6.2.0",
+    "dotenv-expand": "^4.2.0",
     "emittery": "^0.4.1",
     "immutable": "^4.0.0-rc.12",
     "jwt-decode": "^2.2.0",
@@ -18,9 +19,11 @@
     "react-redux": "^6.0.1",
     "react-scripts": "2.1.5",
     "redux": "^4.0.1",
+    "redux-form": "^8.1.0",
     "redux-thunk": "^2.3.0",
     "source-map": "^0.7.3",
-    "utf-8-validate": "^5.0.2"
+    "utf-8-validate": "^5.0.2",
+    "web3": "0.20.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -31,10 +34,5 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "browserslist": [">0.2%", "not dead", "not ie <= 11", "not op_mini all"]
 }
