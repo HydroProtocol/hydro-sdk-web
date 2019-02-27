@@ -7,6 +7,7 @@ import TradeHistory from './components/TradeHistory';
 import WebsocketConnector from './components/WebsocketConnector';
 import OrderBook from './components/Orderbook';
 import Trade from './components/Trade';
+import Balance from './components/Balance';
 
 const mapStateToProps = state => {
   return {
@@ -37,6 +38,10 @@ class App extends React.PureComponent {
   }
 
   render() {
+    const { currentMarket } = this.props;
+    if (!currentMarket) {
+      return null;
+    }
     return (
       <div className="app bg-secondary">
         <WebsocketConnector />
@@ -52,6 +57,9 @@ class App extends React.PureComponent {
               <div className="flex flex-1" style={{ padding: 10 }}>
                 <div className="flex flex-1 col-6">
                   <Trade />
+                </div>
+                <div className="flex flex-1 col-6">
+                  <Balance />
                 </div>
               </div>
             </div>

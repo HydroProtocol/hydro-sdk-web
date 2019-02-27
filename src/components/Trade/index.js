@@ -37,7 +37,7 @@ class Trade extends React.PureComponent {
     }
 
     return (
-      <div className="trade flex-1 column-center ">
+      <div className="trade flex-1 column-center">
         <ul className="nav nav-tabs border-0">
           <li className="nav-item col-6">
             <a
@@ -57,13 +57,21 @@ class Trade extends React.PureComponent {
         <form className="text-white" style={{ padding: 15 }} onSubmit={handleSubmit(() => this.submit())}>
           <div className="form-group">
             <label>Price</label>
-            <Field name="price" className="form-control" component={'input'} />
-            <span className="unit text-dark">{currentMarket.quoteToken}</span>
+            <div className="input-group">
+              <Field name="price" className="form-control" component={'input'} />
+              <div className="input-group-append">
+                <span className="input-group-text">{currentMarket.quoteToken}</span>
+              </div>
+            </div>
           </div>
           <div className="form-group">
             <label>Amount</label>
-            <Field name="amount" className="form-control" component={'input'} />
-            <span className="unit text-dark">{currentMarket.baseToken}</span>
+            <div className="input-group">
+              <Field name="amount" className="form-control" component={'input'} />
+              <div className="input-group-append">
+                <span className="input-group-text">{currentMarket.baseToken}</span>
+              </div>
+            </div>
           </div>
           <button type="submit" className={`form-control btn ${side === 'buy' ? 'btn-success' : 'btn-danger'}`}>
             {side}

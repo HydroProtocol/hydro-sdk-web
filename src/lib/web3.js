@@ -1,9 +1,10 @@
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
 import { loadAccount, loadAccountBalance } from '../actions/account';
+import abi from './abi';
 import env from './env';
 
-export let web3;
+export let web3, Contract;
 const accountWatchers = new Map();
 
 const EIP712Domain = [
@@ -26,7 +27,7 @@ const Order = [
 const domain = {
   name: 'Hydro Protocol',
   version: '1',
-  verifyingContract: env.HYDRO_PROXY_ADDRESS
+  verifyingContract: env.HYDRO_CONTRACT_ADDRESS
 };
 
 const getEIP712Data = order => {
@@ -38,6 +39,30 @@ const getEIP712Data = order => {
     domain,
     primaryType: 'Order',
     message: order
+  });
+};
+
+export const getTokenBalance = (tokenAddress, accountAddress) => {
+  const contract = Contract.at(tokenAddress);
+  return new Promise((resolve, reject) => {
+    contract.balanceOf(accountAddress, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(new BigNumber(result));
+    });
+  });
+};
+
+export const getAllowance = async (tokenAddress, accountAddress) => {
+  const contract = Contract.at(tokenAddress);
+  return new Promise((resolve, reject) => {
+    contract.allowance(accountAddress, env.HYDRO_PROXY_ADDRESS, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(new BigNumber(result));
+    });
   });
 };
 
@@ -76,6 +101,60 @@ export const personalSign = (message, address) => {
   });
 };
 
+export const enable = (address, symbol) => {
+  return async (dispatch, getState) => {
+    let transactionID = await dispatch(
+      approve(address, symbol, '0xf000000000000000000000000000000000000000000000000000000000000000', 'Approve')
+    );
+    return transactionID;
+  };
+};
+
+export const disable = (address, symbol) => {
+  return async (dispatch, getState) => {
+    let transactionID = await dispatch(
+      approve(address, symbol, '0x0000000000000000000000000000000000000000000000000000000000000000', 'Disapprove')
+    );
+    return transactionID;
+  };
+};
+
+export const approve = (tokenAddress, symbol, allowance, action) => {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const isApprove = action === 'Approve';
+    let status = isApprove ? 'Enable' : 'Disable';
+    const accountAddress = state.account.get('address');
+    const contract = Contract.at(tokenAddress);
+
+    let params = {
+      from: accountAddress,
+      to: tokenAddress,
+      data: contract.approve.getData(env.HYDRO_PROXY_ADDRESS, allowance),
+      value: 0,
+      gas: 80000
+    };
+
+    try {
+      const transactionId = await new Promise((resolve, reject) => {
+        web3.eth.sendTransaction(params, (err, txId) => {
+          if (err) {
+            reject(err);
+          }
+
+          resolve(txId);
+        });
+      });
+
+      alert(`${status} ${symbol} request submitted`);
+      return transactionId;
+    } catch (e) {
+      alert(e);
+    }
+    return null;
+  };
+};
+
 export const initWatchers = () => {
   return async dispatch => {
     loadMetamask();
@@ -86,6 +165,7 @@ export const initWatchers = () => {
 const loadMetamask = () => {
   if (typeof window.ethereum !== 'undefined') {
     web3 = new Web3(window.ethereum);
+    Contract = web3.eth.contract(abi);
   }
 };
 

@@ -41,11 +41,11 @@ class WebsocketConnector extends React.PureComponent {
 
   componentDidUpdate(prevProps) {
     const { address, currentMarket, isLoggedIn } = this.props;
-    const marketChange = currentMarket !== prevProps.currentMarket;
+    const isMarketChange = currentMarket && currentMarket !== prevProps.currentMarket;
     const loggedInChange = isLoggedIn !== prevProps.isLoggedIn;
-    const accountChange = address !== prevProps.account;
+    const accountChange = address !== prevProps.address;
 
-    if (marketChange) {
+    if (isMarketChange) {
       const market = this.props.currentMarket;
       this.changeMarket(market.id);
     }

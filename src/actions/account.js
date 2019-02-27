@@ -1,4 +1,4 @@
-import { personalSign } from '../lib/web3';
+import { personalSign, getAllowance, getTokenBalance } from '../lib/web3';
 import { saveLoginData, loadAccountJwt } from '../lib/session';
 import env from '../lib/env';
 import BigNumber from 'bignumber.js';
@@ -6,14 +6,15 @@ import axios from 'axios';
 
 export const loadAccount = address => {
   return (dispatch, getState) => {
-    const jwt = loadAccountJwt(address);
-    if (jwt) {
-      dispatch(login(address, jwt));
-    }
-    return dispatch({
+    dispatch({
       type: 'LOAD_ACCOUNT',
       payload: { address }
     });
+    const isLoggedIn = getState().account.get('isLoggedIn');
+    const jwt = loadAccountJwt(address);
+    if (jwt && !isLoggedIn) {
+      dispatch(login(address, jwt));
+    }
   };
 };
 
@@ -61,16 +62,22 @@ export const loginRequest = address => {
 };
 
 export const login = (address, jwt) => {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     saveLoginData(address, jwt);
-    await dispatch(loadAccountLockedBalance());
+    dispatch(loadAccountLockedBalance());
     dispatch({ type: 'LOGIN' });
   };
 };
 
 export const loadAccountLockedBalance = () => {
   return async (dispatch, getState) => {
-    const res = await axios.get(`${env.API_ADDRESS}/v3/account/lockedBalances`);
+    const address = getState().account.get('address');
+    const jwt = loadAccountJwt(address);
+    const res = await axios.get(`${env.API_ADDRESS}/v3/account/lockedBalances`, {
+      headers: {
+        'Jwt-Authentication': jwt
+      }
+    });
     const lockedBalances = {};
     if (res.data.status === 0) {
       res.data.data.lockedBalances.forEach(x => {
@@ -89,5 +96,28 @@ export const updateTokenLockedBalances = lockedBalances => {
   return {
     type: 'UPDATE_TOKEN_LOCKED_BALANCES',
     payload: lockedBalances
+  };
+};
+
+export const loadToken = (tokenAddress, symbol) => {
+  return async (dispatch, getState) => {
+    const accountAddress = getState().account.get('address');
+    if (!accountAddress) {
+      return;
+    }
+
+    const [balance, allowance] = await Promise.all([
+      getTokenBalance(tokenAddress, accountAddress),
+      getAllowance(tokenAddress, accountAddress)
+    ]);
+
+    await dispatch({
+      type: 'LOAD_TOKEN',
+      payload: {
+        symbol,
+        balance,
+        allowance
+      }
+    });
   };
 };

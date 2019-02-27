@@ -1,5 +1,3 @@
-@import '~bootstrap/scss/bootstrap.scss';
-
 html,
 body {
     margin: 0;
@@ -32,10 +30,6 @@ body {
     flex-direction: column;
     justify-content: center;
 }
-.relative {
-    position: relative;
-    overflow: hidden;
-}
 .ps__rail-y {
     display: none;
 }
@@ -59,13 +53,5 @@ body {
         display: flex;
         flex-direction: column;
         overflow: hidden;
-    }
-    .form-group {
-        position: relative;
-    }
-    .unit {
-        position: absolute;
-        top: 0;
-        right: 0;
     }
 }

@@ -26,6 +26,17 @@ export const initState = Map({
 
 export default (state = initState, action) => {
   switch (action.type) {
+    case 'UPDATE_TOKEN_LOCKED_BALANCES':
+      for (const k of Object.keys(action.payload)) {
+        state = state.setIn(['lockedBalances', k], action.payload[k]);
+      }
+      state = state.setIn(['lockedLoaded'], true);
+      return state;
+    case 'LOAD_TOKEN':
+      const { symbol, balance, allowance } = action.payload;
+      state = state.setIn(['allowances', symbol], allowance);
+      state = state.setIn(['balances', symbol], balance);
+      return state;
     case 'LOAD_ACCOUNT':
       state = state.set('address', action.payload.address);
       return state;
