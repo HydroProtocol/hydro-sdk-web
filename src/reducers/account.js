@@ -59,6 +59,9 @@ export default (state = initState, action) => {
         state = state.setIn(ordersPath, order);
       }
       return state;
+    case 'CANCEL_ORDER':
+      state = state.deleteIn(['orders', action.payload.id]);
+      return state;
     case 'LOAD_TRADES':
       state = state.set('trades', OrderedMap());
       action.payload.trades.reverse().forEach(t => {

@@ -18,6 +18,7 @@ export const setWrapType = type => {
   };
 };
 
+// load account when found address from metamask web3
 export const loadAccount = address => {
   return (dispatch, getState) => {
     dispatch({
@@ -32,7 +33,8 @@ export const loadAccount = address => {
   };
 };
 
-export const loadAccountBalance = (account, balance) => {
+// load ETH balance
+export const loadAccountBalance = balance => {
   return (dispatch, getState) => {
     dispatch({
       type: 'LOAD_BALANCE',
@@ -41,6 +43,7 @@ export const loadAccountBalance = (account, balance) => {
   };
 };
 
+// Matamask Privacy Mode
 export const enableMetamask = () => {
   return async dispatch => {
     if (!window.ethereum) {
@@ -55,6 +58,7 @@ export const enableMetamask = () => {
   };
 };
 
+// request ddex private auth token
 export const loginRequest = address => {
   return async (dispatch, getState) => {
     const message = `Signing this message proves your ownership of your Ethereum wallet address to DDEX without giving DDEX access to any sensitive information. Message ID: @${Date.now()}.`;
@@ -77,6 +81,7 @@ export const loginRequest = address => {
 
 export const login = (address, jwt) => {
   return (dispatch, getState) => {
+    // save jwt to localstorage
     saveLoginData(address, jwt);
     dispatch(loadAccountLockedBalance());
     dispatch({ type: 'LOGIN' });
@@ -113,6 +118,7 @@ export const updateTokenLockedBalances = lockedBalances => {
   };
 };
 
+// load ERC20 token balance and allowance
 export const loadToken = (tokenAddress, symbol) => {
   return async (dispatch, getState) => {
     const accountAddress = getState().account.get('address');
@@ -140,15 +146,11 @@ export const loadOrders = () => {
   return async (dispatch, getState) => {
     const address = getState().account.get('address');
     const jwt = loadAccountJwt(address);
-    const marketId = getState().market.getIn(['markets', 'currentMarket']).id;
     const res = await axios.get(`${env.API_ADDRESS}/v3/orders?status=pending`, {
       headers: {
         'Jwt-Authentication': jwt
       }
     });
-    if (marketId !== getState().market.getIn(['markets', 'currentMarket']).id) {
-      return;
-    }
 
     if (res.data.status === 0) {
       const data = res.data.data;
@@ -202,8 +204,11 @@ export const cancelOrder = id => {
     });
 
     if (res.data.status === 0) {
-      await dispatch(loadOrders());
       alert('Successfully cancelled order');
+      dispatch({
+        type: 'CANCEL_ORDER',
+        payload: { id }
+      });
     } else {
       alert(res.data.desc);
     }
