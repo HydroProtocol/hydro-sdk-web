@@ -101,6 +101,77 @@ export const personalSign = (message, address) => {
   });
 };
 
+export const wrapETH = amount => {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const address = state.account.get('address');
+    const WETH = state.config.get('WETH');
+    const value = new BigNumber(amount).multipliedBy(Math.pow(10, WETH.decimals)).toString();
+
+    let params = {
+      from: address,
+      to: WETH.address,
+      data: web3.sha3('deposit()').slice(0, 10),
+      value,
+      gas: 80000
+    };
+
+    try {
+      const transactionId = await new Promise((resolve, reject) => {
+        web3.eth.sendTransaction(params, (err, txId) => {
+          if (err) {
+            reject(err);
+          }
+
+          resolve(txId);
+        });
+      });
+
+      alert(`Wrap ETH request submitted`);
+      return transactionId;
+    } catch (e) {
+      alert(e);
+    }
+    return null;
+  };
+};
+
+export const unwrapWETH = amount => {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const address = state.account.get('address');
+    const WETH = state.config.get('WETH');
+    const value = new BigNumber(amount).multipliedBy(Math.pow(10, WETH.decimals)).toString();
+    const contract = Contract.at(WETH.address);
+
+    let params = {
+      from: address,
+      to: WETH.address,
+      data: contract.withdraw.getData(value),
+      value: 0,
+      gas: 80000
+    };
+
+    try {
+      const transactionId = await new Promise((resolve, reject) => {
+        web3.eth.sendTransaction(params, (err, txId) => {
+          if (err) {
+            reject(err);
+          }
+
+          resolve(txId);
+        });
+      });
+
+      alert(`Unwrap WETH request submitted`);
+      return transactionId;
+    } catch (e) {
+      alert(e);
+    }
+    return null;
+  };
+};
+
 export const enable = (address, symbol) => {
   return async (dispatch, getState) => {
     let transactionID = await dispatch(

@@ -1,10 +1,10 @@
 import axios from 'axios';
 import env from '../lib/env';
 
-export const loadBaseCurrencyToken = () => {
+export const loadWETH = () => {
   return async dispatch => {
     const response = await axios.get(`${env.API_ADDRESS}/v3/tokens/WETH`);
-    dispatch(setConfigs({ baseCurrencyToken: response.data.data.token }));
+    dispatch(setConfigs({ WETH: response.data.data.token }));
   };
 };
 

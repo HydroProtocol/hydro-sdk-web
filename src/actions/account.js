@@ -4,6 +4,20 @@ import env from '../lib/env';
 import BigNumber from 'bignumber.js';
 import axios from 'axios';
 
+export const WRAP_TYPE = {
+  WRAP: 'WRAP',
+  UNWRAP: 'UNWRAP'
+};
+
+export const setWrapType = type => {
+  return dispatch => {
+    dispatch({
+      type: 'SET_WRAP_TYPE',
+      payload: { type }
+    });
+  };
+};
+
 export const loadAccount = address => {
   return (dispatch, getState) => {
     dispatch({
@@ -119,5 +133,72 @@ export const loadToken = (tokenAddress, symbol) => {
         allowance
       }
     });
+  };
+};
+
+export const loadOrders = () => {
+  return async (dispatch, getState) => {
+    const address = getState().account.get('address');
+    const jwt = loadAccountJwt(address);
+    const marketId = getState().market.getIn(['markets', 'currentMarket']).id;
+    const res = await axios.get(`${env.API_ADDRESS}/v3/orders?marketId=${marketId}`, {
+      headers: {
+        'Jwt-Authentication': jwt
+      }
+    });
+    if (marketId !== getState().market.getIn(['markets', 'currentMarket']).id) {
+      return;
+    }
+
+    if (res.data.status === 0) {
+      const data = res.data.data;
+      return dispatch({
+        type: 'LOAD_ORDERS',
+        payload: {
+          orders: data ? data.orders.map(format) : []
+        }
+      });
+    } else {
+      alert(res.data.desc);
+    }
+  };
+};
+
+export const cancelOrder = id => {
+  return async (dispatch, getState) => {
+    const address = getState().account.get('address');
+    const jwt = loadAccountJwt(address);
+    const res = await axios.delete(`${env.API_ADDRESS}/v3/orders/${id}`, {
+      headers: {
+        'Jwt-Authentication': jwt
+      }
+    });
+
+    if (res.data.status === 0) {
+      await dispatch(loadOrders());
+      alert('Successfully cancelled order');
+    } else {
+      alert(res.data.desc);
+    }
+  };
+};
+
+const format = json => {
+  return {
+    id: json.id,
+    marketId: json.marketId,
+    side: json.side,
+    status: json.status,
+    gasFeeAmount: new BigNumber(json.gasFeeAmount || 0), // TODO, remove hack for production data
+    makerFeeRate: new BigNumber(json.makerFeeRate || 0), // TODO, remove hack for production data
+    takerFeeRate: new BigNumber(json.takerFeeRate || 0), // TODO, remove hack for production data
+    price: new BigNumber(json.price),
+    availableAmount: new BigNumber(json.availableAmount),
+    canceledAmount: new BigNumber(json.canceledAmount),
+    confirmedAmount: new BigNumber(json.confirmedAmount),
+    pendingAmount: new BigNumber(json.pendingAmount),
+    createdAt: json.createdAt,
+    json: json.json,
+    amount: new BigNumber(json.amount)
   };
 };

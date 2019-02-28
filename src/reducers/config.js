@@ -1,7 +1,7 @@
 import { Map } from 'immutable';
 
 const initialState = Map({
-  baseCurrencyToken: {
+  WETH: {
     address: '',
     symbol: '',
     decimals: 0

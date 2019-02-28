@@ -8,6 +8,8 @@ import WebsocketConnector from './components/WebsocketConnector';
 import OrderBook from './components/Orderbook';
 import Trade from './components/Trade';
 import Balance from './components/Balance';
+import { loadWETH } from './actions/config';
+import Orders from './components/Orders';
 
 const mapStateToProps = state => {
   return {
@@ -25,6 +27,7 @@ class App extends React.PureComponent {
     const { dispatch, currentMarket } = this.props;
     dispatch(loadMarkets());
     dispatch(initWatchers());
+    dispatch(loadWETH());
     if (currentMarket) {
       dispatch(loadTradeHistory(currentMarket.id));
     }
@@ -65,6 +68,7 @@ class App extends React.PureComponent {
             </div>
             <div className="grid border flex-1">
               <div className="title border-bottom text-light">Orders</div>
+              <Orders />
             </div>
           </div>
           <div className="grid border">

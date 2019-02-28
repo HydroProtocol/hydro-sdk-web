@@ -1,13 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { loadToken } from '../../actions/account';
+import { loadToken, WRAP_TYPE, setWrapType } from '../../actions/account';
 import { toUnitAmount, isTokenApproved } from '../../lib/utils';
 import BigNumber from 'bignumber.js';
 import { enable, disable } from '../../lib/web3';
+import Wrap from '../Wrap';
 
 const mapStateToProps = state => {
   return {
-    balances: state.account.get('balances'),
+    currentMarket: state.market.getIn(['markets', 'currentMarket']),
+    WETH: state.config.get('WETH'),
+    tokenBalances: state.account.get('tokenBalances'),
     allowances: state.account.get('allowances'),
     currentMarket: state.market.getIn(['markets', 'currentMarket']),
     address: state.account.get('address'),
@@ -19,7 +22,7 @@ const mapStateToProps = state => {
 class Balance extends React.PureComponent {
   componentDidMount() {
     const { currentMarket, address, dispatch, isLoggedIn } = this.props;
-    if (address && currentMarket && isLoggedIn) {
+    if (address && isLoggedIn) {
       dispatch(loadToken(currentMarket.baseTokenAddress, currentMarket.baseToken));
       dispatch(loadToken(currentMarket.quoteTokenAddress, currentMarket.quoteToken));
     }
@@ -30,14 +33,14 @@ class Balance extends React.PureComponent {
     const marketChange = currentMarket !== prevProps.currentMarket;
     const loggedInChange = isLoggedIn !== prevProps.isLoggedIn;
     const accountChange = address !== prevProps.address;
-    if (isLoggedIn && address && currentMarket && (marketChange || loggedInChange || accountChange)) {
+    if (isLoggedIn && address && (marketChange || loggedInChange || accountChange)) {
       dispatch(loadToken(currentMarket.baseTokenAddress, currentMarket.baseToken));
       dispatch(loadToken(currentMarket.quoteTokenAddress, currentMarket.quoteToken));
     }
   }
 
   render() {
-    const { currentMarket } = this.props;
+    const { currentMarket, dispatch, WETH } = this.props;
     return (
       <div className="balance flex-1 column-center text-white">
         {this.renderTokenPanel(
@@ -50,14 +53,34 @@ class Balance extends React.PureComponent {
           currentMarket.quoteTokenAddress,
           currentMarket.quoteTokenDecimals
         )}
-        <div className="" />
+
+        {currentMarket.quoteToken === WETH.symbol && (
+          <div className="flex justify-content-center" style={{ padding: 10 }}>
+            <button
+              className="btn btn-success col-5"
+              data-toggle="modal"
+              data-target="#wrap"
+              onClick={() => dispatch(setWrapType(WRAP_TYPE.WRAP))}>
+              WRAP
+            </button>
+            <div className="col-2" />
+            <button
+              className="btn btn-danger col-5"
+              data-toggle="modal"
+              data-target="#wrap"
+              onClick={() => dispatch(setWrapType(WRAP_TYPE.UNWRAP))}>
+              UNWRAP
+            </button>
+            <Wrap />
+          </div>
+        )}
       </div>
     );
   }
 
   renderTokenPanel(symbol, address, decimals) {
-    const { balances, allowances, lockedBalances, dispatch } = this.props;
-    const balance = toUnitAmount(balances.get(symbol) || new BigNumber(0), decimals);
+    const { tokenBalances, allowances, lockedBalances, dispatch } = this.props;
+    const balance = toUnitAmount(tokenBalances.get(symbol) || new BigNumber(0), decimals);
     const lockedBalance = toUnitAmount(lockedBalances.get(symbol) || new BigNumber('0'), decimals);
     const isApproved = isTokenApproved(allowances.get(symbol) || new BigNumber('0'));
     return (
@@ -86,11 +109,11 @@ class Balance extends React.PureComponent {
           </div>
           <div className="col-6">
             {isApproved ? (
-              <button className="btn btn-danger" onClick={() => dispatch(enable(address, symbol))}>
+              <button className="btn btn-danger" onClick={() => dispatch(disable(address, symbol))}>
                 Disable
               </button>
             ) : (
-              <button className="btn btn-success" onClick={() => dispatch(disable(address, symbol))}>
+              <button className="btn btn-success" onClick={() => dispatch(enable(address, symbol))}>
                 Enable
               </button>
             )}

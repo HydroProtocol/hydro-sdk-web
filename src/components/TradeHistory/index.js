@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import BigNumber from 'bignumber.js';
 import PerfectScrollbar from 'perfect-scrollbar';
+import moment from 'moment';
 
 const mapStateToProps = state => {
   return {
@@ -43,7 +44,7 @@ class TradeHistory extends React.PureComponent {
                       <i className="fa fa-arrow-down" aria-hidden="true" />
                     )}
                   </td>
-                  <td>{trade.executedAt}</td>
+                  <td>{moment(trade.executedAt).format('hh:mm:ss')}</td>
                 </tr>
               );
             })}
