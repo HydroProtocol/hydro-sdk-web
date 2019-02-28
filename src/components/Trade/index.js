@@ -276,7 +276,6 @@ class Trade extends React.PureComponent {
       change('marketOrderWorstPrice', marketOrderWorstPrice);
       change('marketOrderWorstTotalQuote', calculateWorstResult.totalQuoteTokens);
       change('marketOrderWorstTotalBase', calculateWorstResult.totalBaseTokens);
-      console.log(this.props);
     }
   }
 }
