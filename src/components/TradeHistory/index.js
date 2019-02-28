@@ -6,7 +6,8 @@ import moment from 'moment';
 
 const mapStateToProps = state => {
   return {
-    tradeHistory: state.market.get('tradeHistory')
+    tradeHistory: state.market.get('tradeHistory'),
+    currentMarket: state.market.getIn(['markets', 'currentMarket'])
   };
 };
 
@@ -19,7 +20,7 @@ class TradeHistory extends React.PureComponent {
   }
 
   render() {
-    const { tradeHistory } = this.props;
+    const { tradeHistory, currentMarket } = this.props;
     return (
       <div className="trade-history flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
         <table className="table table-dark table-hover table-sm">
@@ -35,9 +36,9 @@ class TradeHistory extends React.PureComponent {
               const colorGreen = trade.side === 'buy';
               return (
                 <tr key={trade.id}>
-                  <td>{new BigNumber(trade.amount).toFixed(5)}</td>
+                  <td>{new BigNumber(trade.amount).toFixed(currentMarket.amountDecimals)}</td>
                   <td className={[colorGreen ? 'text-success' : 'text-danger'].join(' ')}>
-                    {new BigNumber(trade.price).toFixed(8)}
+                    {new BigNumber(trade.price).toFixed(currentMarket.priceDecimals)}
                     {trade.side === 'buy' ? (
                       <i className="fa fa-arrow-up" aria-hidden="true" />
                     ) : (

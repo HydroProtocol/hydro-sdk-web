@@ -42,7 +42,7 @@ class Balance extends React.PureComponent {
   render() {
     const { currentMarket, dispatch, WETH } = this.props;
     return (
-      <div className="balance flex-1 column-center text-white">
+      <div className="balance flex-1 column-center text-white" style={{ maxWidth: 450 }}>
         {this.renderTokenPanel(
           currentMarket.baseToken,
           currentMarket.baseTokenAddress,
@@ -88,19 +88,19 @@ class Balance extends React.PureComponent {
         <div className="flex">
           <div className="col-6 text-right">{symbol} Balance:</div>
           <div className="col-6">
-            {balance.toFixed(5)} {symbol}
+            {balance.toFixed(8)} {symbol}
           </div>
         </div>
         <div className="flex">
           <div className="col-6 text-right">{symbol} Locked:</div>
           <div className="col-6">
-            {lockedBalance.toFixed(5)} {symbol}
+            {lockedBalance.toFixed(8)} {symbol}
           </div>
         </div>
         <div className="flex">
           <div className="col-6 text-right">{symbol} Available:</div>
           <div className="col-6">
-            {balance.minus(lockedBalance).toFixed(5)} {symbol}
+            {balance.minus(lockedBalance).toFixed(8)} {symbol}
           </div>
         </div>
         <div className="flex">

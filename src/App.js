@@ -58,10 +58,10 @@ class App extends React.PureComponent {
             <div className="grid flex-1 border">
               <div className="title border-bottom text-light">Trade</div>
               <div className="flex flex-1" style={{ padding: 10 }}>
-                <div className="flex flex-1 col-6">
+                <div className="flex flex-1 col-6 justify-content-center">
                   <Trade />
                 </div>
-                <div className="flex flex-1 col-6">
+                <div className="flex flex-1 col-6 justify-content-center">
                   <Balance />
                 </div>
               </div>

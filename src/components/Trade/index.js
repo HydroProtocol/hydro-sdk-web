@@ -96,7 +96,7 @@ class Trade extends React.PureComponent {
     }
 
     return (
-      <div className="trade flex-1 column-center">
+      <div className="trade flex-1 column-center" style={{ maxWidth: 450 }}>
         <ul className="nav nav-tabs border-0">
           <li className="nav-item col-6">
             <a

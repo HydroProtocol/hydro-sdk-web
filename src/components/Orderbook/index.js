@@ -38,7 +38,7 @@ class OrderBook extends React.Component {
   }
 
   render() {
-    let { bids, asks, websocketConnected } = this.props;
+    let { bids, asks, websocketConnected, currentMarket } = this.props;
 
     return (
       <div className="orderbook bg-dark text-white">
@@ -53,9 +53,9 @@ class OrderBook extends React.Component {
               .toArray()
               .map(([price, amount]) => {
                 return (
-                  <div className="flex" key={price.toFixed(12)} style={{ height: '5%' }}>
-                    <div className="col-6 text-danger">{price.toFixed(12)}</div>
-                    <div className="col-6 orderbook-amount">{amount.toFixed(5)}</div>
+                  <div className="flex" key={price.toString()} style={{ height: '5%' }}>
+                    <div className="col-6 text-danger">{price.toFixed(currentMarket.priceDecimals)}</div>
+                    <div className="col-6 orderbook-amount">{amount.toFixed(currentMarket.amountDecimals)}</div>
                   </div>
                 );
               })}
@@ -77,9 +77,9 @@ class OrderBook extends React.Component {
               .toArray()
               .map(([price, amount]) => {
                 return (
-                  <div className="flex" key={price.toFixed(12)} style={{ height: '5%' }}>
-                    <div className="col-6 text-success">{price.toFixed(12)}</div>
-                    <div className="col-6 orderbook-amount">{amount.toFixed(5)}</div>
+                  <div className="flex" key={price.toString()} style={{ height: '5%' }}>
+                    <div className="col-6 text-success">{price.toFixed(currentMarket.priceDecimals)}</div>
+                    <div className="col-6 orderbook-amount">{amount.toFixed(currentMarket.amountDecimals)}</div>
                   </div>
                 );
               })}

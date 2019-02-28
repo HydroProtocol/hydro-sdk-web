@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { loadOrders, cancelOrder } from '../../actions/account';
-import BigNumber from 'bignumber.js';
 
 const mapStateToProps = state => {
   return {
@@ -29,7 +28,7 @@ class Orders extends React.PureComponent {
   }
 
   render() {
-    const { orders, dispatch } = this.props;
+    const { orders, dispatch, currentMarket } = this.props;
     return (
       <div className="orders">
         <table className="table table-dark">
@@ -55,9 +54,9 @@ class Orders extends React.PureComponent {
                   <tr key={id}>
                     <td>{order.marketId}</td>
                     <td className={order.side === 'sell' ? 'text-danger' : 'text-success'}>{order.side}</td>
-                    <td className="text-right">{order.price.toFixed(8)}</td>
+                    <td className="text-right">{order.price.toFixed(currentMarket.priceDecimals)}</td>
                     <td className="text-right">
-                      {order.availableAmount.toFixed(8)} {symbol}
+                      {order.availableAmount.toFixed(currentMarket.amountDecimals)} {symbol}
                     </td>
                     <td className="text-right">
                       <button className="btn btn-outline-danger" onClick={() => dispatch(cancelOrder(order.id))}>

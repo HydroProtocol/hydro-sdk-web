@@ -43,7 +43,7 @@ class Wrap extends React.PureComponent {
                 <label>
                   Amount{' '}
                   <font className="text-secondary">
-                    (ETH Balance: {ethBalance.toFixed(5)} WETH Balance: {wethBalance.toFixed(5)})
+                    (ETH Balance: {ethBalance.toFixed(8)} WETH Balance: {wethBalance.toFixed(8)})
                   </font>
                 </label>
                 <div className="input-group">
