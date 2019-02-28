@@ -265,7 +265,7 @@ class Trade extends React.PureComponent {
       const rate =
         side === 'buy'
           ? (marketOrderWorstPrice = new BigNumber(1).plus(marketOrderMaxSlippage))
-          : (marketOrderWorstPrice = new BigNumber(1).sub(marketOrderMaxSlippage));
+          : (marketOrderWorstPrice = new BigNumber(1).minus(marketOrderMaxSlippage));
 
       marketOrderWorstPrice = new BigNumber(rate.multipliedBy(calculateParam.price).toPrecision(pricePrecision)).dp(
         priceDecimals,
