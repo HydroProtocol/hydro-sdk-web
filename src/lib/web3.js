@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
-import { loadAccount, loadAccountBalance, loadToken } from '../actions/account';
+import { loadAccount, loadAccountBalance, watchToken } from '../actions/account';
 import abi from './abi';
 import env from './env';
 
@@ -128,9 +128,13 @@ export const wrapETH = amount => {
       });
 
       alert(`Wrap ETH request submitted`);
-      watchTransactionStatus(transactionId, async () => {
-        await dispatch(loadToken(WETH.address, WETH.symbol));
-        alert('Wrap ETH Successfully');
+      watchTransactionStatus(transactionId, async success => {
+        if (success) {
+          dispatch(watchToken(WETH.address, WETH.symbol));
+          alert('Wrap ETH Successfully');
+        } else {
+          alert('Wrap ETH Failed');
+        }
       });
       return transactionId;
     } catch (e) {
@@ -168,9 +172,13 @@ export const unwrapWETH = amount => {
       });
 
       alert(`Unwrap WETH request submitted`);
-      watchTransactionStatus(transactionId, async () => {
-        await dispatch(loadToken(WETH.address, WETH.symbol));
-        alert('Wrap ETH Successfully');
+      watchTransactionStatus(transactionId, async success => {
+        if (success) {
+          dispatch(watchToken(WETH.address, WETH.symbol));
+          alert('Wrap ETH Successfully');
+        } else {
+          alert('Wrap ETH Failed');
+        }
       });
       return transactionId;
     } catch (e) {
@@ -226,9 +234,13 @@ export const approve = (tokenAddress, symbol, allowance, action) => {
       });
 
       alert(`${status} ${symbol} request submitted`);
-      watchTransactionStatus(transactionId, async () => {
-        await dispatch(loadToken(tokenAddress, symbol));
-        alert(`${status} ${symbol} Successfully`);
+      watchTransactionStatus(transactionId, async success => {
+        if (success) {
+          dispatch(watchToken(tokenAddress, symbol));
+          alert(`${status} ${symbol} Successfully`);
+        } else {
+          alert(`${status} ${symbol} Failed`);
+        }
       });
       return transactionId;
     } catch (e) {
@@ -247,11 +259,11 @@ export const initWatchers = () => {
 
 const watchTransactionStatus = (txId, callback) => {
   const getTransaction = () => {
-    web3.eth.getTransaction(txId, (err, result) => {
-      if (!result.blockNumber) {
+    web3.eth.getTransactionReceipt(txId, (err, result) => {
+      if (!result) {
         window.setTimeout(getTransaction(txId), 3000);
       } else if (callback) {
-        callback();
+        callback(result.status === '0x1');
       } else {
         alert('success');
       }

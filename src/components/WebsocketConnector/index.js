@@ -5,7 +5,7 @@ import { loadAccountJwt } from '../../lib/session';
 import { initOrderbook, updateOrderbook } from '../../actions/orderbook';
 import env from '../../lib/env';
 import { setConfigs } from '../../actions/config';
-import { orderUpdate, loadToken, updateTokenLockedBalances } from '../../actions/account';
+import { orderUpdate, watchToken, updateTokenLockedBalances } from '../../actions/account';
 import { tradeUpdate, marketTrade } from '../../actions/trade';
 import { sleep } from '../../lib/utils';
 
@@ -221,17 +221,8 @@ class WebsocketConnector extends React.PureComponent {
           dispatch(marketTrade(trade));
 
           if (address) {
-            const _loadToken = () => {
-              dispatch(
-                loadToken(currentMarket.baseTokenAddress, currentMarket.baseToken, currentMarket.baseTokenDecimals)
-              );
-              dispatch(
-                loadToken(currentMarket.quoteTokenAddress, currentMarket.quoteToken, currentMarket.quoteTokenDecimals)
-              );
-            };
-            for (let i = 0; i < 10; i++) {
-              setTimeout(_loadToken, 3000 * i);
-            }
+            dispatch(watchToken(currentMarket.baseTokenAddress, currentMarket.baseToken));
+            dispatch(watchToken(currentMarket.quoteTokenAddress, currentMarket.quoteToken));
           }
           break;
         default:

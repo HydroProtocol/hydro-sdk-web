@@ -131,7 +131,7 @@ export const loadToken = (tokenAddress, symbol) => {
       getAllowance(tokenAddress, accountAddress)
     ]);
 
-    await dispatch({
+    return dispatch({
       type: 'LOAD_TOKEN',
       payload: {
         symbol,
@@ -139,6 +139,14 @@ export const loadToken = (tokenAddress, symbol) => {
         allowance
       }
     });
+  };
+};
+
+export const watchToken = (tokenAddress, symbol) => {
+  return dispatch => {
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => dispatch(loadToken(tokenAddress, symbol)), 3000 * i);
+    }
   };
 };
 
@@ -221,9 +229,9 @@ const format = json => {
     marketId: json.marketId,
     side: json.side,
     status: json.status,
-    gasFeeAmount: new BigNumber(json.gasFeeAmount || 0), // TODO, remove hack for production data
-    makerFeeRate: new BigNumber(json.makerFeeRate || 0), // TODO, remove hack for production data
-    takerFeeRate: new BigNumber(json.takerFeeRate || 0), // TODO, remove hack for production data
+    gasFeeAmount: new BigNumber(json.gasFeeAmount || 0),
+    makerFeeRate: new BigNumber(json.makerFeeRate || 0),
+    takerFeeRate: new BigNumber(json.takerFeeRate || 0),
     price: new BigNumber(json.price),
     availableAmount: new BigNumber(json.availableAmount),
     canceledAmount: new BigNumber(json.canceledAmount),
