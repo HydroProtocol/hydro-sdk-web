@@ -16,9 +16,7 @@ export const loadMarkets = () => {
     const res = await axios.get(`${env.API_ADDRESS}/v3/markets`);
     if (res.data.status === 0) {
       const markets = res.data.data.markets;
-
       markets.forEach(formatMarket);
-
       return dispatch({
         type: 'LOAD_MARKETS',
         payload: { markets }

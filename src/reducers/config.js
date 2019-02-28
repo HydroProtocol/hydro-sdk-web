@@ -1,4 +1,5 @@
 import { Map } from 'immutable';
+import BigNumber from 'bignumber.js';
 
 const initialState = Map({
   WETH: {
@@ -6,6 +7,7 @@ const initialState = Map({
     symbol: '',
     decimals: 0
   },
+  hotTokenAmount: new BigNumber(0),
   websocketConnected: false
 });
 
