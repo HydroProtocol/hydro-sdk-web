@@ -38,9 +38,12 @@ class Header extends React.PureComponent {
             style={{ maxHeight: 350, overflow: 'auto' }}>
             {markets.map(market => {
               return (
-                <a className="dropdown-item" key={market.id} onClick={() => dispatch(updateCurrentMarket(market))}>
+                <button
+                  className="dropdown-item"
+                  key={market.id}
+                  onClick={() => currentMarket.id !== market.id && dispatch(updateCurrentMarket(market))}>
                   {market.id}
-                </a>
+                </button>
               );
             })}
           </div>

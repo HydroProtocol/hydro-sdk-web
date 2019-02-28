@@ -99,21 +99,21 @@ class Trade extends React.PureComponent {
       <div className="trade flex-1 column-center" style={{ maxWidth: 450 }}>
         <ul className="nav nav-tabs border-0">
           <li className="nav-item col-6">
-            <a
-              className={`nav-link btn border-light text-center${side === 'buy' ? ' active' : ''}`}
+            <button
+              className={`nav-link btn border-light btn-block text-center${side === 'buy' ? ' active' : ''}`}
               onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'buy'))}>
               Buy
-            </a>
+            </button>
           </li>
           <li className="nav-item col-6">
-            <a
-              className={`nav-link btn border-light text-center${side === 'sell' ? ' active' : ''}`}
+            <button
+              className={`nav-link btn border-light  btn-block text-center${side === 'sell' ? ' active' : ''}`}
               onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'sell'))}>
               Sell
-            </a>
+            </button>
           </li>
         </ul>
-        <form className="text-white" style={{ padding: 15 }} onSubmit={handleSubmit(() => this.submit())}>
+        <form className="text-white" style={{ marginTop: 10 }} onSubmit={handleSubmit(() => this.submit())}>
           <div className="form-group">
             <label>Order Type</label>
             <Field className="form-control" name="orderType" component={'select'}>

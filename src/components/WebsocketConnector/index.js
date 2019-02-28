@@ -4,13 +4,9 @@ import BigNumber from 'bignumber.js';
 import { loadAccountJwt } from '../../lib/session';
 import { initOrderbook, updateOrderbook } from '../../actions/orderbook';
 import env from '../../lib/env';
-// import { accountBalanceLoaded } from '@share/actions/accounts';
 import { setConfigs } from '../../actions/config';
-// import { orderUpdate } from '@share/actions/orders';
-// import { loadToken, updateTokenLockedBalances } from '@share/actions/tokens';
-// import { marketTrade, tradeCompleted, tradeUpdate } from '@share/actions/trades';
-// import { updateCommonTransaction } from '@share/actions/transactions';
-// import { apiVersion } from '@share/api';
+import { orderUpdate, loadToken, updateTokenLockedBalances } from '../../actions/account';
+import { tradeUpdate, marketTrade } from '../../actions/trade';
 import { sleep } from '../../lib/utils';
 
 const mapStateToProps = state => {
@@ -41,7 +37,7 @@ class WebsocketConnector extends React.PureComponent {
 
   componentDidUpdate(prevProps) {
     const { address, currentMarket, isLoggedIn } = this.props;
-    const isMarketChange = currentMarket && currentMarket !== prevProps.currentMarket;
+    const isMarketChange = currentMarket !== prevProps.currentMarket;
     const loggedInChange = isLoggedIn !== prevProps.isLoggedIn;
     const accountChange = address !== prevProps.address;
 
@@ -173,7 +169,7 @@ class WebsocketConnector extends React.PureComponent {
     };
     this.socket.onmessage = event => {
       const data = JSON.parse(event.data);
-      const { currentMarket, account, selected, markets } = this.props;
+      const { currentMarket, address } = this.props;
       switch (data.type) {
         case 'level2OrderbookSnapshot':
           if (data.marketId !== currentMarket.id) {
@@ -192,24 +188,21 @@ class WebsocketConnector extends React.PureComponent {
           });
           break;
         case 'orderUpdate':
-          if (data.order.marketId !== currentMarket.id) {
-            break;
+          if (data.order.marketId === currentMarket.id) {
+            dispatch(orderUpdate(data.order));
           }
-          // dispatch(orderUpdate(data.order));
           break;
         case 'balance':
-          // dispatch(
-          //   updateTokenLockedBalances({
-          //     [data.symbol]: data.amount
-          //   })
-          // );
+          dispatch(
+            updateTokenLockedBalances({
+              [data.symbol]: data.amount
+            })
+          );
           break;
         case 'tradeUpdate':
-          if (data.trade.marketId !== currentMarket.id) {
-            break;
+          if (data.trade.marketId === currentMarket.id) {
+            dispatch(tradeUpdate(data.trade));
           }
-          // dispatch(tradeUpdate(data.trade));
-          // dispatch(tradeCompleted(data.trade));
           break;
         case 'trade_success':
           if (data.marketId !== currentMarket.id) {
@@ -225,70 +218,21 @@ class WebsocketConnector extends React.PureComponent {
             executedAt: data.time,
             createdAt: data.time
           };
-          // dispatch(marketTrade(trade));
+          dispatch(marketTrade(trade));
 
-          if (account) {
-            // const _loadToken = () => {
-            //   dispatch(
-            //     loadToken(
-            //       selected,
-            //       currentMarket.baseTokenAddress,
-            //       currentMarket.baseToken,
-            //       currentMarket.baseTokenDecimals
-            //     )
-            //   );
-            //   dispatch(
-            //     loadToken(
-            //       selected,
-            //       currentMarket.quoteTokenAddress,
-            //       currentMarket.quoteToken,
-            //       currentMarket.quoteTokenDecimals
-            //     )
-            //   );
-            // };
-            // for (let i = 0; i < 10; i++) {
-            //   setTimeout(_loadToken, 3000 * i);
-            // }
+          if (address) {
+            const _loadToken = () => {
+              dispatch(
+                loadToken(currentMarket.baseTokenAddress, currentMarket.baseToken, currentMarket.baseTokenDecimals)
+              );
+              dispatch(
+                loadToken(currentMarket.quoteTokenAddress, currentMarket.quoteToken, currentMarket.quoteTokenDecimals)
+              );
+            };
+            for (let i = 0; i < 10; i++) {
+              setTimeout(_loadToken, 3000 * i);
+            }
           }
-          break;
-        case 'commonTransactionUpdate':
-          const tx = data.transaction;
-          const symbol = tx.data.symbol;
-
-          const reloadBalance = () => {
-            const market = markets.find(m => !!m && (m.baseToken === symbol || m.quoteToken === symbol));
-            let address, decimals;
-
-            if (market && symbol === market.quoteToken) {
-              address = market.quoteTokenAddress;
-              decimals = market.quoteTokenDecimals;
-            } else if (market && symbol === market.baseToken) {
-              address = market.baseTokenAddress;
-              decimals = market.baseTokenDecimals;
-            }
-
-            if (address) {
-              // dispatch(loadToken(selected, address, symbol, decimals));
-            }
-
-            if (
-              account &&
-              (tx.type === 'WRAP_ETHER' ||
-                tx.type === 'UNWRAP_ETHER' ||
-                tx.type === 'WRAP_TRON' ||
-                tx.type === 'UNWRAP_TRON')
-            ) {
-              // blockchain.getBalance(account, (err, balance) => {
-              //   dispatch(accountBalanceLoaded(account, selected, balance));
-              // });
-            }
-          };
-          // dispatch(updateCommonTransaction(tx));
-
-          for (let i = 0; i < 10; i++) {
-            setTimeout(reloadBalance, 3000 * i);
-          }
-
           break;
         default:
           break;

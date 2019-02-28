@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
-import { loadAccount, loadAccountBalance } from '../actions/account';
+import { loadAccount, loadAccountBalance, loadToken } from '../actions/account';
 import abi from './abi';
 import env from './env';
 
@@ -128,6 +128,10 @@ export const wrapETH = amount => {
       });
 
       alert(`Wrap ETH request submitted`);
+      watchTransactionStatus(transactionId, async () => {
+        await dispatch(loadToken(WETH.address, WETH.symbol));
+        alert('Wrap ETH Successfully');
+      });
       return transactionId;
     } catch (e) {
       alert(e);
@@ -164,6 +168,10 @@ export const unwrapWETH = amount => {
       });
 
       alert(`Unwrap WETH request submitted`);
+      watchTransactionStatus(transactionId, async () => {
+        await dispatch(loadToken(WETH.address, WETH.symbol));
+        alert('Wrap ETH Successfully');
+      });
       return transactionId;
     } catch (e) {
       alert(e);
@@ -218,6 +226,10 @@ export const approve = (tokenAddress, symbol, allowance, action) => {
       });
 
       alert(`${status} ${symbol} request submitted`);
+      watchTransactionStatus(transactionId, async () => {
+        await dispatch(loadToken(tokenAddress, symbol));
+        alert(`${status} ${symbol} Successfully`);
+      });
       return transactionId;
     } catch (e) {
       alert(e);
@@ -231,6 +243,21 @@ export const initWatchers = () => {
     loadMetamask();
     dispatch(startAccountWatchers());
   };
+};
+
+const watchTransactionStatus = (txId, callback) => {
+  const getTransaction = () => {
+    web3.eth.getTransaction(txId, (err, result) => {
+      if (!result.blockNumber) {
+        window.setTimeout(getTransaction(txId), 3000);
+      } else if (callback) {
+        callback();
+      } else {
+        alert('success');
+      }
+    });
+  };
+  window.setTimeout(getTransaction(txId), 3000);
 };
 
 const loadMetamask = () => {

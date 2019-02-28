@@ -73,3 +73,21 @@ const createOrder = (side, price, amount, orderType, expires) => {
     }
   };
 };
+
+export const tradeUpdate = trade => {
+  return {
+    type: 'TRADE_UPDATE',
+    payload: {
+      trade
+    }
+  };
+};
+
+export const marketTrade = trade => {
+  return {
+    type: 'MARKET_TRADE',
+    payload: {
+      trade
+    }
+  };
+};

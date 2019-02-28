@@ -5,8 +5,7 @@ import { loadOrders, cancelOrder } from '../../actions/account';
 const mapStateToProps = state => {
   return {
     orders: state.account.get('orders'),
-    isLoggedIn: state.account.get('isLoggedIn'),
-    currentMarket: state.market.getIn(['markets', 'currentMarket'])
+    isLoggedIn: state.account.get('isLoggedIn')
   };
 };
 
@@ -19,16 +18,14 @@ class Orders extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const { isLoggedIn, dispatch, currentMarket } = this.props;
-    const marketChange = currentMarket !== prevProps.currentMarket;
-    const loggedInChange = isLoggedIn !== prevProps.isLoggedIn;
-    if (isLoggedIn && (marketChange || loggedInChange)) {
+    const { isLoggedIn, dispatch } = this.props;
+    if (isLoggedIn && isLoggedIn !== prevProps.isLoggedIn) {
       dispatch(loadOrders());
     }
   }
 
   render() {
-    const { orders, dispatch, currentMarket } = this.props;
+    const { orders, dispatch } = this.props;
     return (
       <div className="orders">
         <table className="table table-dark">
@@ -47,16 +44,16 @@ class Orders extends React.PureComponent {
               .reverse()
               .map(([id, order]) => {
                 if (order.availableAmount.eq(0)) {
-                  return;
+                  return null;
                 }
                 const symbol = order.marketId.split('-')[0];
                 return (
                   <tr key={id}>
                     <td>{order.marketId}</td>
                     <td className={order.side === 'sell' ? 'text-danger' : 'text-success'}>{order.side}</td>
-                    <td className="text-right">{order.price.toFixed(currentMarket.priceDecimals)}</td>
+                    <td className="text-right">{order.price.toFixed()}</td>
                     <td className="text-right">
-                      {order.availableAmount.toFixed(currentMarket.amountDecimals)} {symbol}
+                      {order.availableAmount.toFixed()} {symbol}
                     </td>
                     <td className="text-right">
                       <button className="btn btn-outline-danger" onClick={() => dispatch(cancelOrder(order.id))}>

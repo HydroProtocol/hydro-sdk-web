@@ -8,7 +8,6 @@ import Wrap from '../Wrap';
 
 const mapStateToProps = state => {
   return {
-    currentMarket: state.market.getIn(['markets', 'currentMarket']),
     WETH: state.config.get('WETH'),
     tokenBalances: state.account.get('tokenBalances'),
     allowances: state.account.get('allowances'),

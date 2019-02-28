@@ -1,4 +1,4 @@
-import { Map, List } from 'immutable';
+import { Map, List, OrderedMap } from 'immutable';
 
 const initialOrderbook = Map({
   bids: List(),
@@ -37,7 +37,7 @@ const initialState = Map({
   })
 });
 
-const reverseBigNumberComparator = (a: any, b: any) => {
+const reverseBigNumberComparator = (a, b) => {
   if (a[0].gt(b[0])) {
     return -1;
   } else if (a[0].eq(b[0])) {
@@ -55,21 +55,26 @@ export default (state = initialState, action) => {
         state = state.setIn(['markets', 'currentMarket'], action.payload.markets[0]);
       }
       return state;
-    case 'LOAD_MARKET_STATUS':
-      state = state.setIn(['marketStatus', 'data'], List(action.payload.marketStatus));
-      return state;
     case 'UPDATE_CURRENT_MARKET': {
       const currentMarket = action.payload.currentMarket;
       const { asTakerFeeRate, asMakerFeeRate, gasFeeAmount } = currentMarket;
       state = state.setIn(['markets', 'currentMarket'], currentMarket);
       state = state.setIn(['markets', 'currentMarketFees'], { asTakerFeeRate, asMakerFeeRate, gasFeeAmount });
       state = state.set('orderbook', initialOrderbook);
-      state = state.set('tradeHistory', List());
+      state = state.set('tradeHistory', OrderedMap());
       return state;
     }
     case 'LOAD_TRADE_HISTORY':
-      state = state.set('tradeHistory', List(action.payload.reverse()));
+      state = state.set('tradeHistory', OrderedMap());
+      action.payload.reverse().forEach(t => {
+        state = state.setIn(['tradeHistory', t.id], t);
+      });
       return state;
+    case 'MARKET_TRADE': {
+      let trade = action.payload.trade;
+      state = state.setIn(['tradeHistory', trade.id], trade);
+      return state;
+    }
     case 'INIT_ORDERBOOK':
       state = state.setIn(['orderbook', 'bids'], List(action.payload.bids).sort(reverseBigNumberComparator));
       state = state.setIn(['orderbook', 'asks'], List(action.payload.asks).sort(reverseBigNumberComparator));

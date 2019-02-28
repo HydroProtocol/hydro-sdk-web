@@ -141,7 +141,7 @@ export const loadOrders = () => {
     const address = getState().account.get('address');
     const jwt = loadAccountJwt(address);
     const marketId = getState().market.getIn(['markets', 'currentMarket']).id;
-    const res = await axios.get(`${env.API_ADDRESS}/v3/orders?marketId=${marketId}`, {
+    const res = await axios.get(`${env.API_ADDRESS}/v3/orders?status=pending`, {
       headers: {
         'Jwt-Authentication': jwt
       }
@@ -161,6 +161,33 @@ export const loadOrders = () => {
     } else {
       alert(res.data.desc);
     }
+  };
+};
+
+export const loadTrades = () => {
+  return async (dispatch, getState) => {
+    const address = getState().account.get('address');
+    const jwt = loadAccountJwt(address);
+    const res = await axios.get(`${env.API_ADDRESS}/v3/markets/myALLTrades`, {
+      headers: {
+        'Jwt-Authentication': jwt
+      }
+    });
+    const data = res.data.data;
+
+    return dispatch({
+      type: 'LOAD_TRADES',
+      payload: {
+        trades: data ? data.trades : []
+      }
+    });
+  };
+};
+
+export const orderUpdate = json => {
+  return {
+    type: 'ORDER_UPDATE',
+    payload: { order: format(json) }
   };
 };
 

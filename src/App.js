@@ -10,6 +10,7 @@ import Trade from './components/Trade';
 import Balance from './components/Balance';
 import { loadWETH } from './actions/config';
 import Orders from './components/Orders';
+import Trades from './components/Trades';
 
 const mapStateToProps = state => {
   return {
@@ -66,9 +67,15 @@ class App extends React.PureComponent {
                 </div>
               </div>
             </div>
-            <div className="grid border flex-1">
-              <div className="title border-bottom text-light">Orders</div>
-              <Orders />
+            <div className="flex flex-1">
+              <div className="grid border flex-1">
+                <div className="title border-bottom text-light">Orders</div>
+                <Orders />
+              </div>
+              <div className="grid border flex-1">
+                <div className="title border-bottom text-light">Trades</div>
+                <Trades />
+              </div>
             </div>
           </div>
           <div className="grid border">

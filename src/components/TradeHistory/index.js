@@ -32,23 +32,26 @@ class TradeHistory extends React.PureComponent {
             </tr>
           </thead>
           <tbody>
-            {tradeHistory.reverse().map(trade => {
-              const colorGreen = trade.side === 'buy';
-              return (
-                <tr key={trade.id}>
-                  <td>{new BigNumber(trade.amount).toFixed(currentMarket.amountDecimals)}</td>
-                  <td className={[colorGreen ? 'text-success' : 'text-danger'].join(' ')}>
-                    {new BigNumber(trade.price).toFixed(currentMarket.priceDecimals)}
-                    {trade.side === 'buy' ? (
-                      <i className="fa fa-arrow-up" aria-hidden="true" />
-                    ) : (
-                      <i className="fa fa-arrow-down" aria-hidden="true" />
-                    )}
-                  </td>
-                  <td>{moment(trade.executedAt).format('hh:mm:ss')}</td>
-                </tr>
-              );
-            })}
+            {tradeHistory
+              .toArray()
+              .reverse()
+              .map(([id, trade]) => {
+                const colorGreen = trade.side === 'buy';
+                return (
+                  <tr key={trade.id}>
+                    <td>{new BigNumber(trade.amount).toFixed(currentMarket.amountDecimals)}</td>
+                    <td className={[colorGreen ? 'text-success' : 'text-danger'].join(' ')}>
+                      {new BigNumber(trade.price).toFixed(currentMarket.priceDecimals)}
+                      {trade.side === 'buy' ? (
+                        <i className="fa fa-arrow-up" aria-hidden="true" />
+                      ) : (
+                        <i className="fa fa-arrow-down" aria-hidden="true" />
+                      )}
+                    </td>
+                    <td>{moment(trade.executedAt).format('hh:mm:ss')}</td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
       </div>
