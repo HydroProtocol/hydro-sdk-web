@@ -1,7 +1,5 @@
-import axios from 'axios';
 import { signOrder } from '../lib/web3';
-import env from '../lib/env';
-import { loadAccountJwt } from '../lib/session';
+import api from '../lib/api';
 
 export const TRADE_FORM_ID = 'TRADE';
 
@@ -27,24 +25,15 @@ const createOrder = (side, price, amount, orderType, expires) => {
     const state = getState();
     const address = state.account.get('address');
     const currentMarket = state.market.getIn(['markets', 'currentMarket']);
-    const jwt = loadAccountJwt(address);
 
-    const buildOrderResponse = await axios.post(
-      `${env.API_ADDRESS}/v3/orders/build`,
-      {
-        amount,
-        price,
-        side,
-        expires,
-        orderType,
-        marketId: currentMarket.id
-      },
-      {
-        headers: {
-          'Jwt-Authentication': jwt
-        }
-      }
-    );
+    const buildOrderResponse = await api.post('/orders/build', {
+      amount,
+      price,
+      side,
+      expires,
+      orderType,
+      marketId: currentMarket.id
+    });
 
     if (buildOrderResponse.data.status !== 0) {
       return buildOrderResponse.data;
@@ -53,19 +42,11 @@ const createOrder = (side, price, amount, orderType, expires) => {
     const { id: orderId, json: order } = orderParams;
     try {
       const signature = await signOrder(address, order);
-      const placeOrderResponse = await axios.post(
-        `${env.API_ADDRESS}/v3/orders`,
-        {
-          orderId,
-          signature,
-          method: 1
-        },
-        {
-          headers: {
-            'Jwt-Authentication': jwt
-          }
-        }
-      );
+      const placeOrderResponse = await api.post('/orders', {
+        orderId,
+        signature,
+        method: 1
+      });
 
       return placeOrderResponse.data;
     } catch (e) {

@@ -65,7 +65,7 @@ class Header extends React.PureComponent {
       );
     } else {
       return (
-        <div className="navbar-text">
+        <div className="navbar-text text-white">
           Detecting... <i className="fa fa-spinner fa-spin" />
         </div>
       );

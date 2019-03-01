@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import { loadAccount, loadAccountBalance, watchToken } from '../actions/account';
 import abi from './abi';
 import env from './env';
+import { callPromise } from './utils';
 
 export let web3, Contract;
 const accountWatchers = new Map();
@@ -44,26 +45,12 @@ const getEIP712Data = order => {
 
 export const getTokenBalance = (tokenAddress, accountAddress) => {
   const contract = Contract.at(tokenAddress);
-  return new Promise((resolve, reject) => {
-    contract.balanceOf(accountAddress, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(new BigNumber(result));
-    });
-  });
+  return callPromise(contract.balanceOf, accountAddress);
 };
 
 export const getAllowance = async (tokenAddress, accountAddress) => {
   const contract = Contract.at(tokenAddress);
-  return new Promise((resolve, reject) => {
-    contract.allowance(accountAddress, env.HYDRO_PROXY_ADDRESS, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(new BigNumber(result));
-    });
-  });
+  return callPromise(contract.allowance, accountAddress, env.HYDRO_PROXY_ADDRESS);
 };
 
 export const signOrder = async (address, order) => {
@@ -91,14 +78,7 @@ export const signOrder = async (address, order) => {
 };
 
 export const personalSign = (message, address) => {
-  return new Promise((resolve, reject) => {
-    web3.personal.sign(web3.toHex(message), address, (err, signature) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(signature);
-    });
-  });
+  return callPromise(web3.personal.sign, web3.toHex(message), address);
 };
 
 export const wrapETH = amount => {
@@ -117,15 +97,7 @@ export const wrapETH = amount => {
     };
 
     try {
-      const transactionId = await new Promise((resolve, reject) => {
-        web3.eth.sendTransaction(params, (err, txId) => {
-          if (err) {
-            reject(err);
-          }
-
-          resolve(txId);
-        });
-      });
+      const transactionId = await callPromise(web3.eth.sendTransaction, params);
 
       alert(`Wrap ETH request submitted`);
       watchTransactionStatus(transactionId, async success => {
@@ -161,15 +133,7 @@ export const unwrapWETH = amount => {
     };
 
     try {
-      const transactionId = await new Promise((resolve, reject) => {
-        web3.eth.sendTransaction(params, (err, txId) => {
-          if (err) {
-            reject(err);
-          }
-
-          resolve(txId);
-        });
-      });
+      const transactionId = await callPromise(web3.eth.sendTransaction, params);
 
       alert(`Unwrap WETH request submitted`);
       watchTransactionStatus(transactionId, async success => {
@@ -223,15 +187,7 @@ export const approve = (tokenAddress, symbol, allowance, action) => {
     };
 
     try {
-      const transactionId = await new Promise((resolve, reject) => {
-        web3.eth.sendTransaction(params, (err, txId) => {
-          if (err) {
-            reject(err);
-          }
-
-          resolve(txId);
-        });
-      });
+      const transactionId = await callPromise(web3.eth.sendTransaction, params);
 
       alert(`${status} ${symbol} request submitted`);
       watchTransactionStatus(transactionId, async success => {
@@ -337,15 +293,4 @@ const loadWalletAccountBalance = () => {
       await dispatch(loadAccountBalance(balance));
     } catch (e) {}
   };
-};
-
-const callPromise = (fn, ...args) => {
-  return new Promise((resolve, reject) => {
-    fn(...args, (err, result) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    });
-  });
 };

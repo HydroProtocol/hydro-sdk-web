@@ -8,11 +8,6 @@ import BigNumber from 'bignumber.js';
 import { loadHotDiscountRules, getHotTokenAmount } from '../../actions/fee';
 import { calculateTrade } from '../../lib/tradeCalculator';
 
-const validate = (values, props) => {
-  let errors = {};
-  return errors;
-};
-
 const mapStateToProps = state => {
   const selector = formValueSelector(TRADE_FORM_ID);
   const bids = state.market.getIn(['orderbook', 'bids']);
@@ -285,7 +280,6 @@ class Trade extends React.PureComponent {
 export default connect(mapStateToProps)(
   reduxForm({
     form: TRADE_FORM_ID,
-    validate,
     destroyOnUnmount: false
   })(Trade)
 );

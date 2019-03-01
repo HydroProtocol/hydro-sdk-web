@@ -1,8 +1,7 @@
 import { personalSign, getAllowance, getTokenBalance } from '../lib/web3';
 import { saveLoginData, loadAccountJwt } from '../lib/session';
-import env from '../lib/env';
 import BigNumber from 'bignumber.js';
-import axios from 'axios';
+import api from '../lib/api';
 
 export const WRAP_TYPE = {
   WRAP: 'WRAP',
@@ -18,7 +17,7 @@ export const setWrapType = type => {
   };
 };
 
-// load account when found address from metamask web3
+// 从Metamask读取到address，处理登录状态
 export const loadAccount = address => {
   return (dispatch, getState) => {
     dispatch({
@@ -66,7 +65,7 @@ export const loginRequest = address => {
     if (!signature) {
       return;
     }
-    const res = await axios.post(`${env.API_ADDRESS}/v3/account/jwt`, null, {
+    const res = await api.post('/account/jwt', null, {
       headers: {
         'Hydro-Authentication': address + '#' + message + '#' + signature
       }
@@ -88,15 +87,10 @@ export const login = (address, jwt) => {
   };
 };
 
+// 获取账号锁定余额(订单中的余额)
 export const loadAccountLockedBalance = () => {
   return async (dispatch, getState) => {
-    const address = getState().account.get('address');
-    const jwt = loadAccountJwt(address);
-    const res = await axios.get(`${env.API_ADDRESS}/v3/account/lockedBalances`, {
-      headers: {
-        'Jwt-Authentication': jwt
-      }
-    });
+    const res = await api.get('/account/lockedBalances');
     const lockedBalances = {};
     if (res.data.status === 0) {
       res.data.data.lockedBalances.forEach(x => {
@@ -142,6 +136,7 @@ export const loadToken = (tokenAddress, symbol) => {
   };
 };
 
+// load ERC20 token 10 times
 export const watchToken = (tokenAddress, symbol) => {
   return dispatch => {
     for (let i = 0; i < 10; i++) {
@@ -150,15 +145,10 @@ export const watchToken = (tokenAddress, symbol) => {
   };
 };
 
+// load all my pending orders
 export const loadOrders = () => {
   return async (dispatch, getState) => {
-    const address = getState().account.get('address');
-    const jwt = loadAccountJwt(address);
-    const res = await axios.get(`${env.API_ADDRESS}/v3/orders?status=pending`, {
-      headers: {
-        'Jwt-Authentication': jwt
-      }
-    });
+    const res = await api.get('/orders');
 
     if (res.data.status === 0) {
       const data = res.data.data;
@@ -174,23 +164,22 @@ export const loadOrders = () => {
   };
 };
 
+// load all my trades
 export const loadTrades = () => {
   return async (dispatch, getState) => {
-    const address = getState().account.get('address');
-    const jwt = loadAccountJwt(address);
-    const res = await axios.get(`${env.API_ADDRESS}/v3/markets/myALLTrades`, {
-      headers: {
-        'Jwt-Authentication': jwt
-      }
-    });
-    const data = res.data.data;
+    const res = await api.get('/markets/myALLTrades');
 
-    return dispatch({
-      type: 'LOAD_TRADES',
-      payload: {
-        trades: data ? data.trades : []
-      }
-    });
+    if (res.data.status === 0) {
+      const data = res.data.data;
+      return dispatch({
+        type: 'LOAD_TRADES',
+        payload: {
+          trades: data ? data.trades : []
+        }
+      });
+    } else {
+      alert(res.data.desc);
+    }
   };
 };
 
@@ -203,13 +192,7 @@ export const orderUpdate = json => {
 
 export const cancelOrder = id => {
   return async (dispatch, getState) => {
-    const address = getState().account.get('address');
-    const jwt = loadAccountJwt(address);
-    const res = await axios.delete(`${env.API_ADDRESS}/v3/orders/${id}`, {
-      headers: {
-        'Jwt-Authentication': jwt
-      }
-    });
+    const res = await api.delete(`/orders/${id}`);
 
     if (res.data.status === 0) {
       alert('Successfully cancelled order');
@@ -223,6 +206,7 @@ export const cancelOrder = id => {
   };
 };
 
+// Number or String format to Bignumber
 const format = json => {
   return {
     id: json.id,

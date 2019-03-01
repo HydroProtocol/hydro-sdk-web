@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js';
-import axios from 'axios';
-import env from '../lib/env';
+import api from '../lib/api';
 
 export const updateCurrentMarket = currentMarket => {
   return async dispatch => {
@@ -13,7 +12,7 @@ export const updateCurrentMarket = currentMarket => {
 
 export const loadMarkets = () => {
   return async (dispatch, getState) => {
-    const res = await axios.get(`${env.API_ADDRESS}/v3/markets`);
+    const res = await api.get(`/markets`);
     if (res.data.status === 0) {
       const markets = res.data.data.markets;
       markets.forEach(formatMarket);
@@ -25,9 +24,10 @@ export const loadMarkets = () => {
   };
 };
 
+// load current market trade history
 export const loadTradeHistory = marketId => {
   return async (dispatch, getState) => {
-    const res = await axios.get(`${env.API_ADDRESS}/v3/markets/${marketId}/trades`);
+    const res = await api.get(`/markets/${marketId}/trades`);
     const currentMarket = getState().market.getIn(['markets', 'currentMarket']);
     if (currentMarket.id === marketId) {
       return dispatch({

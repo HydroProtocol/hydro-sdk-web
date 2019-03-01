@@ -1,9 +1,8 @@
-import axios from 'axios';
-import env from '../lib/env';
+import api from '../lib/api';
 
 export const loadWETH = () => {
   return async dispatch => {
-    const response = await axios.get(`${env.API_ADDRESS}/v3/tokens/WETH`);
+    const response = await api.get('/tokens/WETH');
     dispatch(setConfigs({ WETH: response.data.data.token }));
   };
 };
