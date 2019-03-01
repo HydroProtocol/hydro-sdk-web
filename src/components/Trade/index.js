@@ -137,7 +137,9 @@ class Trade extends React.PureComponent {
             <div className="input-group">
               <Field name="amount" className="form-control" component={'input'} />
               <div className="input-group-append">
-                <span className="input-group-text">{currentMarket.baseToken}</span>
+                <span className="input-group-text">
+                  {side === 'buy' && orderType === 'market' ? currentMarket.quoteToken : currentMarket.baseToken}
+                </span>
               </div>
             </div>
           </div>
