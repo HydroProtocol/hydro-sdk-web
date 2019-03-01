@@ -1,4 +1,5 @@
 Hydro Start Kit
 
-## yarn install
-## yarn start
+`yarn install`
+
+`yarn start`
