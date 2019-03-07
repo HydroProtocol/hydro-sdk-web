@@ -47,7 +47,7 @@ class App extends React.PureComponent {
       return null;
     }
     return (
-      <div className="app bg-secondary">
+      <div className="app bg-dark">
         <WebsocketConnector />
         <Header />
         <div className="flex flex-1">

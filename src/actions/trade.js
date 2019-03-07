@@ -1,4 +1,4 @@
-import { signOrder } from '../lib/web3';
+import { personalSign } from '../lib/web3';
 import api from '../lib/api';
 
 export const TRADE_FORM_ID = 'TRADE';
@@ -39,13 +39,13 @@ const createOrder = (side, price, amount, orderType, expires) => {
       return buildOrderResponse.data;
     }
     const orderParams = buildOrderResponse.data.data.order;
-    const { id: orderId, json: order } = orderParams;
+    const { id: orderId } = orderParams;
     try {
-      const signature = await signOrder(address, order);
+      const signature = await personalSign(orderId, address);
       const placeOrderResponse = await api.post('/orders', {
         orderId,
         signature,
-        method: 1
+        method: 0
       });
 
       return placeOrderResponse.data;

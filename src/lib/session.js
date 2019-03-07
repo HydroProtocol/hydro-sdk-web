@@ -46,7 +46,7 @@ export const loadAccountJwt = address => {
     return null;
   }
 
-  if (loginData.address.toLowerCase() === address.toLowerCase()) {
+  if (loginData.address && loginData.address.toLowerCase() === address.toLowerCase()) {
     return loginData.jwt;
   }
 

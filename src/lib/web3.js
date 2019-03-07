@@ -8,41 +8,6 @@ import { callPromise } from './utils';
 export let web3, Contract;
 const accountWatchers = new Map();
 
-const EIP712Domain = [
-  { name: 'name', type: 'string' },
-  { name: 'version', type: 'string' },
-  { name: 'verifyingContract', type: 'address' }
-];
-
-const Order = [
-  { name: 'trader', type: 'address' },
-  { name: 'relayer', type: 'address' },
-  { name: 'baseToken', type: 'address' },
-  { name: 'quoteToken', type: 'address' },
-  { name: 'baseTokenAmount', type: 'uint256' },
-  { name: 'quoteTokenAmount', type: 'uint256' },
-  { name: 'gasTokenAmount', type: 'uint256' },
-  { name: 'data', type: 'bytes32' }
-];
-
-const domain = {
-  name: 'Hydro Protocol',
-  version: '1',
-  verifyingContract: env.HYDRO_CONTRACT_ADDRESS
-};
-
-const getEIP712Data = order => {
-  return JSON.stringify({
-    types: {
-      EIP712Domain,
-      Order
-    },
-    domain,
-    primaryType: 'Order',
-    message: order
-  });
-};
-
 export const getTokenBalance = (tokenAddress, accountAddress) => {
   const contract = Contract.at(tokenAddress);
   return callPromise(contract.balanceOf, accountAddress);
@@ -51,30 +16,6 @@ export const getTokenBalance = (tokenAddress, accountAddress) => {
 export const getAllowance = async (tokenAddress, accountAddress) => {
   const contract = Contract.at(tokenAddress);
   return callPromise(contract.allowance, accountAddress, env.HYDRO_PROXY_ADDRESS);
-};
-
-export const signOrder = async (address, order) => {
-  const data = getEIP712Data(order);
-  return new Promise((resolve, reject) => {
-    web3.currentProvider.sendAsync(
-      {
-        method: 'eth_signTypedData_v3',
-        params: [address, data],
-        from: address
-      },
-      function(err, result) {
-        if (err) {
-          return reject(err);
-        } else if (!result) {
-          return reject(new Error('No Result'));
-        } else if (result.error && result.error.message) {
-          return reject(new Error(result.error.message));
-        }
-
-        return resolve(result.result);
-      }
-    );
-  });
 };
 
 export const personalSign = (message, address) => {
