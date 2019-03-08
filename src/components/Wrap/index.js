@@ -29,7 +29,7 @@ class Wrap extends React.PureComponent {
     return (
       <div className="modal fade" id="wrap" tabIndex="-1" role="dialog" aria-labelledby="wrapLabel" aria-hidden="true">
         <div className="modal-dialog" role="document">
-          <div className="modal-content bg-dark">
+          <div className="modal-content bg-grey">
             <div className="modal-header">
               <h5 className="modal-title" id="wrapLabel">
                 {wrapType}

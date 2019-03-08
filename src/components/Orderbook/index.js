@@ -41,8 +41,8 @@ class OrderBook extends React.Component {
     let { bids, asks, websocketConnected, currentMarket } = this.props;
 
     return (
-      <div className="orderbook bg-dark text-white">
-        <div className="flex header">
+      <div className="orderbook bg-grey text-white">
+        <div className="flex header text-secondary">
           <div className="col-6">Price</div>
           <div className="col-6">Amount</div>
         </div>

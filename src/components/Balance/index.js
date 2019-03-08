@@ -41,7 +41,7 @@ class Balance extends React.PureComponent {
   render() {
     const { currentMarket, dispatch, WETH } = this.props;
     return (
-      <div className="balance flex-1 column-center text-white" style={{ maxWidth: 450 }}>
+      <div className="balance flex-1 column-center text-secondary bg-grey">
         {this.renderTokenPanel(
           currentMarket.baseToken,
           currentMarket.baseTokenAddress,
@@ -56,7 +56,7 @@ class Balance extends React.PureComponent {
         {currentMarket.quoteToken === WETH.symbol && (
           <div className="flex justify-content-center" style={{ padding: 10 }}>
             <button
-              className="btn btn-success col-5"
+              className="btn btn-outline-success col-5"
               data-toggle="modal"
               data-target="#wrap"
               onClick={() => dispatch(setWrapType(WRAP_TYPE.WRAP))}>
@@ -64,7 +64,7 @@ class Balance extends React.PureComponent {
             </button>
             <div className="col-2" />
             <button
-              className="btn btn-danger col-5"
+              className="btn btn-outline-danger col-5"
               data-toggle="modal"
               data-target="#wrap"
               onClick={() => dispatch(setWrapType(WRAP_TYPE.UNWRAP))}>
@@ -83,7 +83,7 @@ class Balance extends React.PureComponent {
     const lockedBalance = toUnitAmount(lockedBalances.get(symbol) || new BigNumber('0'), decimals);
     const isApproved = isTokenApproved(allowances.get(symbol) || new BigNumber('0'));
     return (
-      <div className="border rounded-sm" style={{ padding: 10, margin: 10 }}>
+      <div className="rounded-sm" style={{ padding: 10, margin: 10 }}>
         <div className="flex">
           <div className="col-6 text-right">{symbol} Balance:</div>
           <div className="col-6">
@@ -108,11 +108,11 @@ class Balance extends React.PureComponent {
           </div>
           <div className="col-6">
             {isApproved ? (
-              <button className="btn btn-danger" onClick={() => dispatch(disable(address, symbol))}>
+              <button className="btn btn-outline-danger" onClick={() => dispatch(disable(address, symbol))}>
                 Disable
               </button>
             ) : (
-              <button className="btn btn-success" onClick={() => dispatch(enable(address, symbol))}>
+              <button className="btn btn-outline-success" onClick={() => dispatch(enable(address, symbol))}>
                 Enable
               </button>
             )}

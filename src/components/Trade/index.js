@@ -91,97 +91,92 @@ class Trade extends React.PureComponent {
     }
 
     return (
-      <div className="trade flex-1 column-center" style={{ maxWidth: 450 }}>
-        <ul className="nav nav-tabs border-0">
-          <li className="nav-item col-6">
-            <button
-              className={`nav-link btn border-light btn-block text-center${side === 'buy' ? ' active' : ''}`}
+      <div className="trade flex-1 flex-column">
+        <ul className="nav nav-tabs border-0 bg-dark title column-center">
+          <li className="nav-item">
+            <a
+              className={`pull-right text-secondary text-center${side === 'buy' ? ' active' : ''}`}
               onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'buy'))}>
               Buy
-            </button>
+            </a>
           </li>
-          <li className="nav-item col-6">
-            <button
-              className={`nav-link btn border-light  btn-block text-center${side === 'sell' ? ' active' : ''}`}
+          <li className="nav-item">
+            <a
+              className={`pull-left text-secondary text-center${side === 'sell' ? ' active' : ''}`}
               onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'sell'))}>
               Sell
-            </button>
+            </a>
           </li>
         </ul>
-        <form className="text-white" style={{ marginTop: 10 }} onSubmit={handleSubmit(() => this.submit())}>
-          <div className="form-group">
-            <label>Order Type</label>
-            <Field className="form-control" name="orderType" component={'select'}>
-              <option value="limit">Limit</option>
-              {currentMarket.supportedOrderTypes.indexOf('market') > -1 && <option value="market">Market</option>}
-            </Field>
-          </div>
-          {orderType === 'limit' && (
+        <div className="bg-grey flex-1">
+          <form
+            className="text-secondary flex-1"
+            style={{ margin: '12px auto 0', padding: '0 24px', maxWidth: 450 }}
+            onSubmit={handleSubmit(() => this.submit())}>
             <div className="form-group">
-              <label>Price</label>
+              <label>Order Type</label>
+              <Field className="form-control" name="orderType" component={'select'}>
+                <option value="limit">Limit</option>
+                {currentMarket.supportedOrderTypes.indexOf('market') > -1 && <option value="market">Market</option>}
+              </Field>
+            </div>
+            {orderType === 'limit' && (
+              <div className="form-group">
+                <label>Price</label>
+                <div className="input-group">
+                  <Field name="price" className="form-control" component={'input'} />
+                  <div className="input-group-append">
+                    <span className="input-group-text">{currentMarket.quoteToken}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="form-group">
+              <label>Amount</label>
               <div className="input-group">
-                <Field name="price" className="form-control" component={'input'} />
+                <Field name="amount" className="form-control" component={'input'} />
                 <div className="input-group-append">
-                  <span className="input-group-text">{currentMarket.quoteToken}</span>
+                  <span className="input-group-text">
+                    {side === 'buy' && orderType === 'market' ? currentMarket.quoteToken : currentMarket.baseToken}
+                  </span>
                 </div>
               </div>
             </div>
-          )}
-          <div className="form-group">
-            <label>Amount</label>
-            <div className="input-group">
-              <Field name="amount" className="form-control" component={'input'} />
-              <div className="input-group-append">
-                <span className="input-group-text">
-                  {side === 'buy' && orderType === 'market' ? currentMarket.quoteToken : currentMarket.baseToken}
-                </span>
+            <div className="form-group">
+              {orderType === 'market' && (
+                <div className="flex">
+                  <div className="flex-grow-1" />
+                  <div className="text-white">
+                    Minimum TotalAmount ≈{' '}
+                    {side === 'buy'
+                      ? `${marketOrderWorstTotalBase.toFixed(currentMarket.amountDecimals)} ${currentMarket.baseToken}`
+                      : `${marketOrderWorstTotalQuote.toFixed(currentMarket.amountDecimals)} ${
+                          currentMarket.quoteToken
+                        }`}
+                  </div>
+                </div>
+              )}
+              <div className="flex" style={{ marginBottom: 6 }}>
+                <div className="flex-grow-1">Total</div>
+                <div className="text-white">
+                  Fee ≈ {gasFee.plus(tradeFee).toFixed(currentMarket.priceDecimals)} {currentMarket.quoteToken}
+                </div>
               </div>
+              <input
+                className="form-control"
+                value={
+                  orderType === 'market' && side === 'buy'
+                    ? `${totalBase.toFixed(currentMarket.amountDecimals)} ${currentMarket.baseToken}`
+                    : `${total.toFixed(currentMarket.priceDecimals)} ${currentMarket.quoteToken}`
+                }
+                disabled
+              />
             </div>
-          </div>
-          <div className="form-group border" style={{ padding: 10 }}>
-            <div>
-              <span>Fee</span>
-              <span>
-                ≈ {gasFee.plus(tradeFee).toFixed(currentMarket.priceDecimals)} {currentMarket.quoteToken}
-              </span>
-            </div>
-            {orderType === 'market' && (
-              <div>
-                <span>Minimum TotalAmount</span>
-                <span>
-                  ≈{' '}
-                  {side === 'buy' ? (
-                    <span>
-                      {marketOrderWorstTotalBase.toFixed(currentMarket.amountDecimals)} {currentMarket.baseToken}
-                    </span>
-                  ) : (
-                    <span>
-                      {marketOrderWorstTotalQuote.toFixed(currentMarket.amountDecimals)} {currentMarket.quoteToken}
-                    </span>
-                  )}
-                </span>
-              </div>
-            )}
-            <div>
-              <span>Total Amount</span>
-              <span>
-                ≈{' '}
-                {orderType === 'market' && side === 'buy' ? (
-                  <span>
-                    {totalBase.toFixed(currentMarket.amountDecimals)} {currentMarket.baseToken}
-                  </span>
-                ) : (
-                  <span>
-                    {total.toFixed(currentMarket.priceDecimals)} {currentMarket.quoteToken}
-                  </span>
-                )}
-              </span>
-            </div>
-          </div>
-          <button type="submit" className={`form-control btn ${side === 'buy' ? 'btn-success' : 'btn-danger'}`}>
-            {side}
-          </button>
-        </form>
+            <button type="submit" className={`form-control btn ${side === 'buy' ? 'btn-success' : 'btn-danger'}`}>
+              {side} {currentMarket.baseToken}
+            </button>
+          </form>
+        </div>
       </div>
     );
   }

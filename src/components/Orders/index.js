@@ -27,10 +27,10 @@ class Orders extends React.PureComponent {
   render() {
     const { orders, dispatch } = this.props;
     return (
-      <div className="orders">
-        <table className="table table-dark">
+      <div className="orders flex-1 bg-grey">
+        <table className="table table-dark bg-grey">
           <thead>
-            <tr>
+            <tr className="text-secondary">
               <th>Pair</th>
               <th>Side</th>
               <th className="text-right">Price</th>

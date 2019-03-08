@@ -23,11 +23,11 @@ class TradeHistory extends React.PureComponent {
     const { tradeHistory, currentMarket } = this.props;
     return (
       <div className="trade-history flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
-        <table className="table table-dark table-hover table-sm">
+        <table className="table table-dark table-hover table-sm bg-grey">
           <thead>
-            <tr>
-              <th>Amount</th>
+            <tr className="text-secondary">
               <th>Price</th>
+              <th>Amount</th>
               <th>Time</th>
             </tr>
           </thead>
@@ -39,7 +39,6 @@ class TradeHistory extends React.PureComponent {
                 const colorGreen = trade.side === 'buy';
                 return (
                   <tr key={trade.id}>
-                    <td>{new BigNumber(trade.amount).toFixed(currentMarket.amountDecimals)}</td>
                     <td className={[colorGreen ? 'text-success' : 'text-danger'].join(' ')}>
                       {new BigNumber(trade.price).toFixed(currentMarket.priceDecimals)}
                       {trade.side === 'buy' ? (
@@ -48,7 +47,8 @@ class TradeHistory extends React.PureComponent {
                         <i className="fa fa-arrow-down" aria-hidden="true" />
                       )}
                     </td>
-                    <td>{moment(trade.executedAt).format('hh:mm:ss')}</td>
+                    <td>{new BigNumber(trade.amount).toFixed(currentMarket.amountDecimals)}</td>
+                    <td className="text-secondary">{moment(trade.executedAt).format('hh:mm:ss')}</td>
                   </tr>
                 );
               })}

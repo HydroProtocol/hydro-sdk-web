@@ -2,19 +2,84 @@ html,
 body {
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
-        'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-family: Gill Sans, Gill Sans MT, Calibri, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-size: 13px;
+    font-size: 14px;
     width: 100%;
     height: 100%;
+    background-color: #262626;
 }
 
 #root {
     height: 100%;
 }
+$red: #ff6f75;
+$green: #00d99f;
 
+.nav-item {
+    a {
+        padding: 0 24px;
+        border-bottom: 2px solid #9b9b9b;
+        cursor: pointer;
+    }
+    .active {
+        color: #fff !important;
+        border-color: #fff !important;
+    }
+}
+.bg-black {
+    background-color: #0e0e0e;
+}
+.bg-dark {
+    background-color: #202020 !important;
+}
+.bg-grey {
+    background-color: #303030;
+}
+.text-secondary {
+    color: #9b9b9b !important;
+}
+.text-danger {
+    color: $red !important;
+}
+.text-success {
+    color: $green !important;
+}
+.btn-outline-success {
+    color: $green;
+    border-color: $green;
+    &:hover {
+        background-color: $green;
+    }
+}
+.btn-outline-danger {
+    color: $red;
+    border-color: $red;
+    &:hover {
+        background-color: $red;
+    }
+}
+.btn-success,
+.btn-danger {
+    height: 40px;
+    text-transform: uppercase;
+}
+select.form-control,
+input.form-control {
+    background-color: #202020 !important;
+    height: 32px;
+    color: #fff;
+    border: none;
+    &:focus {
+        color: #fff;
+    }
+}
+.input-group-text {
+    background-color: #202020 !important;
+    border: none;
+    color: #9b9b9b;
+}
 .flex-1 {
     flex: 1;
 }
@@ -44,11 +109,13 @@ body {
     height: 100vh;
     .title {
         font-size: 14px;
-        padding: 8px 12px;
+        padding: 12px;
+        background-color: #202020;
+        height: 45px;
     }
     .grid {
         min-width: 350px;
-        border-radius: 2px;
+        border-radius: 4px;
         margin: 5px;
         display: flex;
         flex-direction: column;
