@@ -66,6 +66,24 @@ $green: #00d99f;
     height: 40px;
     text-transform: uppercase;
 }
+.btn-success {
+    background-color: $green;
+    &:hover,
+    &:focus,
+    &:active {
+        color: #fff;
+        background-color: #00ac7e !important;
+    }
+}
+.btn-danger {
+    background-color: $red;
+    &:hover,
+    &:focus,
+    &:active {
+        color: #fff;
+        background-color: #d9656a !important;
+    }
+}
 select.form-control,
 input.form-control {
     background-color: #202020 !important;
