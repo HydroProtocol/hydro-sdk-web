@@ -27,7 +27,7 @@ class Orders extends React.PureComponent {
   render() {
     const { orders, dispatch } = this.props;
     return (
-      <div className="orders flex-1 bg-grey">
+      <div className="orders flex-1 bg-grey col-12">
         <table className="table table-dark bg-grey">
           <thead>
             <tr className="text-secondary">

@@ -28,7 +28,7 @@ class Trades extends React.PureComponent {
   render() {
     const { trades, address } = this.props;
     return (
-      <div className="trades flex-1 bg-grey">
+      <div className="trades flex-1 bg-grey col-12">
         <table className="table table-dark bg-grey">
           <thead>
             <tr className="text-secondary">
