@@ -6,8 +6,7 @@ export const initState = Map({
   isLoggedIn: false,
   ethBalance: new BigNumber('0'),
   lockedBalances: Map(),
-  allowances: Map(),
-  tokenBalances: Map(),
+  tokensInfo: Map(),
   approving: Map(),
   orders: OrderedMap(),
   trades: OrderedMap(),
@@ -19,11 +18,6 @@ export default (state = initState, action) => {
   switch (action.type) {
     case 'SET_WRAP_TYPE':
       state = state.set('wrapType', action.payload.type);
-      return state;
-    case 'LOAD_TOKEN':
-      const { symbol, balance, allowance } = action.payload;
-      state = state.setIn(['allowances', symbol], allowance);
-      state = state.setIn(['tokenBalances', symbol], balance);
       return state;
     case 'LOAD_ACCOUNT':
       state = state.set('address', action.payload.address);
@@ -71,6 +65,15 @@ export default (state = initState, action) => {
     case 'TRADE_UPDATE':
       let trade = action.payload.trade;
       state = state.setIn(['trades', trade.id], trade);
+      return state;
+    case 'LOAD_TOKEN':
+      const { symbol, balance, allowance, decimals, address } = action.payload;
+      state = state.setIn(['tokensInfo', symbol, 'allowance'], allowance);
+      state = state.setIn(['tokensInfo', symbol, 'balance'], balance);
+      state = state.setIn(['tokensInfo', symbol, 'address'], address);
+      if (decimals) {
+        state = state.setIn(['tokensInfo', symbol, 'decimals'], decimals);
+      }
       return state;
     default:
       return state;

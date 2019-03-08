@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { loadToken, WRAP_TYPE, setWrapType } from '../../actions/account';
+import { WRAP_TYPE, setWrapType, loadTokens } from '../../actions/account';
 import { toUnitAmount, isTokenApproved } from '../../lib/utils';
 import BigNumber from 'bignumber.js';
 import { enable, disable } from '../../lib/web3';
@@ -8,116 +8,102 @@ import Wrap from '../Wrap';
 
 const mapStateToProps = state => {
   return {
-    WETH: state.config.get('WETH'),
-    tokenBalances: state.account.get('tokenBalances'),
-    allowances: state.account.get('allowances'),
-    currentMarket: state.market.getIn(['markets', 'currentMarket']),
+    tokensInfo: state.account.get('tokensInfo'),
     address: state.account.get('address'),
     isLoggedIn: state.account.get('isLoggedIn'),
-    lockedBalances: state.account.get('lockedBalances')
+    lockedBalances: state.account.get('lockedBalances'),
+    ethBalance: toUnitAmount(state.account.get('ethBalance'), 18)
   };
 };
 
 class Balance extends React.PureComponent {
   componentDidMount() {
-    const { currentMarket, address, dispatch, isLoggedIn } = this.props;
+    const { address, dispatch, isLoggedIn } = this.props;
     if (address && isLoggedIn) {
-      dispatch(loadToken(currentMarket.baseTokenAddress, currentMarket.baseToken));
-      dispatch(loadToken(currentMarket.quoteTokenAddress, currentMarket.quoteToken));
+      dispatch(loadTokens());
     }
   }
 
   componentDidUpdate(prevProps) {
-    const { currentMarket, address, dispatch, isLoggedIn } = this.props;
-    const marketChange = currentMarket !== prevProps.currentMarket;
+    const { address, dispatch, isLoggedIn } = this.props;
     const loggedInChange = isLoggedIn !== prevProps.isLoggedIn;
     const accountChange = address !== prevProps.address;
-    if (isLoggedIn && address && (marketChange || loggedInChange || accountChange)) {
-      dispatch(loadToken(currentMarket.baseTokenAddress, currentMarket.baseToken));
-      dispatch(loadToken(currentMarket.quoteTokenAddress, currentMarket.quoteToken));
+    if (isLoggedIn && address && (loggedInChange || accountChange)) {
+      dispatch(loadTokens());
     }
   }
 
   render() {
-    const { currentMarket, dispatch, WETH } = this.props;
+    const { dispatch, tokensInfo, lockedBalances, ethBalance } = this.props;
     return (
-      <div className="balance flex-1 column-center text-secondary bg-grey">
-        {this.renderTokenPanel(
-          currentMarket.baseToken,
-          currentMarket.baseTokenAddress,
-          currentMarket.baseTokenDecimals
-        )}
-        {this.renderTokenPanel(
-          currentMarket.quoteToken,
-          currentMarket.quoteTokenAddress,
-          currentMarket.quoteTokenDecimals
-        )}
-
-        {currentMarket.quoteToken === WETH.symbol && (
-          <div className="flex justify-content-center" style={{ padding: 10 }}>
-            <button
-              className="btn btn-outline-success col-5"
-              data-toggle="modal"
-              data-target="#wrap"
-              onClick={() => dispatch(setWrapType(WRAP_TYPE.WRAP))}>
-              WRAP
-            </button>
-            <div className="col-2" />
-            <button
-              className="btn btn-outline-danger col-5"
-              data-toggle="modal"
-              data-target="#wrap"
-              onClick={() => dispatch(setWrapType(WRAP_TYPE.UNWRAP))}>
-              UNWRAP
-            </button>
-            <Wrap />
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  renderTokenPanel(symbol, address, decimals) {
-    const { tokenBalances, allowances, lockedBalances, dispatch } = this.props;
-    const balance = toUnitAmount(tokenBalances.get(symbol) || new BigNumber(0), decimals);
-    const lockedBalance = toUnitAmount(lockedBalances.get(symbol) || new BigNumber('0'), decimals);
-    const isApproved = isTokenApproved(allowances.get(symbol) || new BigNumber('0'));
-    return (
-      <div className="rounded-sm" style={{ padding: 10, margin: 10 }}>
-        <div className="flex">
-          <div className="col-6 text-right">{symbol} Balance:</div>
-          <div className="col-6">
-            {balance.toFixed(8)} {symbol}
-          </div>
-        </div>
-        <div className="flex">
-          <div className="col-6 text-right">{symbol} Locked:</div>
-          <div className="col-6">
-            {lockedBalance.toFixed(8)} {symbol}
-          </div>
-        </div>
-        <div className="flex">
-          <div className="col-6 text-right">{symbol} Available:</div>
-          <div className="col-6">
-            {balance.minus(lockedBalance).toFixed(8)} {symbol}
-          </div>
-        </div>
-        <div className="flex">
-          <div className="flex col-6 justify-content-end align-items-center">
-            {isApproved ? 'Disable' : 'Enable'} {symbol}
-          </div>
-          <div className="col-6">
-            {isApproved ? (
-              <button className="btn btn-outline-danger" onClick={() => dispatch(disable(address, symbol))}>
-                Disable
-              </button>
-            ) : (
-              <button className="btn btn-outline-success" onClick={() => dispatch(enable(address, symbol))}>
-                Enable
-              </button>
-            )}
-          </div>
-        </div>
+      <div className="balance flex-1 column-center text-secondary bg-grey" style={{ padding: 24 }}>
+        <table className="table table-dark bg-grey">
+          <thead>
+            <tr className="text-secondary">
+              <td>Token</td>
+              <td>Available</td>
+              <td>Action</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ETH</td>
+              <td>{ethBalance.toFixed(5)}</td>
+              <td>
+                <button
+                  className="btn btn-outline-success"
+                  data-toggle="modal"
+                  data-target="#wrap"
+                  onClick={() => dispatch(setWrapType(WRAP_TYPE.WRAP))}>
+                  WRAP
+                </button>
+              </td>
+            </tr>
+            {tokensInfo.toArray().map(([token, info]) => {
+              const { address, balance, allowance, decimals } = info.toJS();
+              const lockedBalance = toUnitAmount(lockedBalances.get(token, new BigNumber('0')), decimals);
+              const isApproved = isTokenApproved(allowance || new BigNumber('0'));
+              return (
+                <tr key={token}>
+                  <td>{token}</td>
+                  <td
+                    data-html="true"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title={`<div>In-Order: ${lockedBalance.toFixed(5)}</div><div>Total: ${toUnitAmount(
+                      balance,
+                      decimals
+                    ).toFixed(5)}</div>`}
+                    ref={ref => window.$(ref).tooltip()}>
+                    {toUnitAmount(balance.minus(lockedBalance) || new BigNumber('0'), decimals).toFixed(5)}
+                  </td>
+                  <td>
+                    {isApproved ? (
+                      <button className="btn btn-outline-danger" onClick={() => dispatch(disable(address, token))}>
+                        Disable
+                      </button>
+                    ) : (
+                      <button className="btn btn-outline-success" onClick={() => dispatch(enable(address, token))}>
+                        Enable
+                      </button>
+                    )}
+                    {token === 'WETH' && (
+                      <button
+                        className="btn btn-outline-danger"
+                        data-toggle="modal"
+                        data-target="#wrap"
+                        style={{ marginLeft: 12 }}
+                        onClick={() => dispatch(setWrapType(WRAP_TYPE.UNWRAP))}>
+                        UNWRAP
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <Wrap />
       </div>
     );
   }

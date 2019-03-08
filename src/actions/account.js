@@ -112,8 +112,58 @@ export const updateTokenLockedBalances = lockedBalances => {
   };
 };
 
-// load ERC20 token balance and allowance
-export const loadToken = (tokenAddress, symbol) => {
+// load ERC20 tokens balance and allowance
+export const loadTokens = () => {
+  try {
+    return async (dispatch, getState) => {
+      const state = getState();
+      const accountAddress = state.account.get('address');
+
+      if (!accountAddress) {
+        return;
+      }
+
+      const markets = state.market.getIn(['markets', 'data']).toArray();
+      let tokens = {};
+      let promises = [];
+
+      // load quote tokens first
+      for (let i = 0; i < markets.length; i++) {
+        const market = markets[i];
+        if (tokens[market.quoteToken]) {
+          continue;
+        }
+        tokens[market.quoteToken] = true;
+        promises.push(dispatch(loadToken(market.quoteTokenAddress, market.quoteToken, market.quoteTokenDecimals)));
+      }
+
+      // then base tokens
+      for (let i = 0; i < markets.length; i++) {
+        const market = markets[i];
+        if (tokens[market.baseToken]) {
+          continue;
+        }
+        tokens[market.baseToken] = true;
+        promises.push(dispatch(loadToken(market.baseTokenAddress, market.baseToken, market.baseTokenDecimals)));
+      }
+
+      await Promise.all(promises);
+    };
+  } catch (e) {
+    alert(e);
+  }
+};
+
+// load ERC20 token 10 times
+export const watchToken = (tokenAddress, symbol) => {
+  return dispatch => {
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => dispatch(loadToken(tokenAddress, symbol)), 3000 * i);
+    }
+  };
+};
+
+export const loadToken = (tokenAddress, symbol, decimals) => {
   return async (dispatch, getState) => {
     const accountAddress = getState().account.get('address');
     if (!accountAddress) {
@@ -128,20 +178,13 @@ export const loadToken = (tokenAddress, symbol) => {
     return dispatch({
       type: 'LOAD_TOKEN',
       payload: {
+        address: tokenAddress,
         symbol,
         balance,
-        allowance
+        allowance,
+        decimals
       }
     });
-  };
-};
-
-// load ERC20 token 10 times
-export const watchToken = (tokenAddress, symbol) => {
-  return dispatch => {
-    for (let i = 0; i < 10; i++) {
-      setTimeout(() => dispatch(loadToken(tokenAddress, symbol)), 3000 * i);
-    }
   };
 };
 

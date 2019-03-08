@@ -8,6 +8,7 @@ body {
     font-size: 14px;
     width: 100%;
     height: 100%;
+    min-width: 1500px;
     background-color: #262626;
 }
 
@@ -73,6 +74,14 @@ input.form-control {
     border: none;
     &:focus {
         color: #fff;
+    }
+}
+table {
+    tr,
+    th,
+    td {
+        margin: 0;
+        border: none !important;
     }
 }
 .input-group-text {
