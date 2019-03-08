@@ -47,9 +47,10 @@ class OrderBook extends React.Component {
           <div className="col-6">Amount</div>
         </div>
         <div style={{ height: '100%' }}>
-          <div className="asks">
+          <div className="asks flex flex-column flex-column-reverse">
             {asks
               .slice(-20)
+              .reverse()
               .toArray()
               .map(([price, amount]) => {
                 return (

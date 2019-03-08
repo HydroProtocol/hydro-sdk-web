@@ -1,13 +1,13 @@
 .orderbook {
-  height: calc(100% - 38px);
-  .header,
-  .status {
-    height: 26px;
-    line-height: 26px;
-  }
-  .asks,
-  .bids {
-    height: calc(50% - 26px);
-    overflow: hidden;
-  }
+    height: calc(100% - 38px);
+    .header,
+    .status {
+        height: 36px;
+        line-height: 36px;
+    }
+    .asks,
+    .bids {
+        height: calc(50% - 26px);
+        overflow: hidden;
+    }
 }
