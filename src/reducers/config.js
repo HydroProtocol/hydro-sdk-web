@@ -3,9 +3,9 @@ import BigNumber from 'bignumber.js';
 
 const initialState = Map({
   WETH: {
-    address: '',
-    symbol: '',
-    decimals: 0
+    address: '0x4a817489643A89a1428b2DD441c3fbe4DBf44789',
+    symbol: 'WETH',
+    decimals: 18
   },
   hotTokenAmount: new BigNumber(0),
   websocketConnected: false

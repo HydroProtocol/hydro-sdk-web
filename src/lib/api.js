@@ -1,18 +1,18 @@
 import axios from 'axios';
 import env from './env';
 import { store } from '../index';
-import { cleanLoginDate, loadAccountJwt } from './session';
+import { cleanLoginDate, loadAccountHydroAuthentication } from './session';
 
 const getAxiosInstance = () => {
   const state = store.getState();
   const address = state.account.get('address');
-  const jwt = loadAccountJwt(address);
+  const jwt = loadAccountHydroAuthentication(address);
   let instance;
 
   if (jwt) {
     instance = axios.create({
       headers: {
-        'Jwt-Authentication': jwt
+        'Hydro-Authentication': jwt
       }
     });
   } else {
@@ -32,10 +32,8 @@ const getAxiosInstance = () => {
   return instance;
 };
 
-export const apiVersion = 'v3';
-
 const _request = (method, url, ...args) => {
-  return getAxiosInstance()[method](`${env.API_ADDRESS}/${apiVersion}${url}`, ...args);
+  return getAxiosInstance()[method](`${env.API_ADDRESS}${url}`, ...args);
 };
 
 const api = {

@@ -52,7 +52,7 @@ export default (state = initialState, action) => {
     case 'LOAD_MARKETS':
       state = state.setIn(['markets', 'data'], List(action.payload.markets));
       if (!state.getIn(['markets', 'currentMarket'])) {
-        state = state.setIn(['markets', 'currentMarket'], action.payload.markets[0]);
+        state = state.setIn(['markets', 'currentMarket'], action.payload.markets[1]);
       }
       return state;
     case 'UPDATE_CURRENT_MARKET': {

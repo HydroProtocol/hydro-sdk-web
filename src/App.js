@@ -8,7 +8,6 @@ import WebsocketConnector from './components/WebsocketConnector';
 import OrderBook from './components/Orderbook';
 import Trade from './components/Trade';
 import Balance from './components/Balance';
-import { loadWETH } from './actions/config';
 import Orders from './components/Orders';
 import Trades from './components/Trades';
 
@@ -28,7 +27,6 @@ class App extends React.PureComponent {
     const { dispatch, currentMarket } = this.props;
     dispatch(loadMarkets());
     dispatch(initWatchers());
-    dispatch(loadWETH());
     if (currentMarket) {
       dispatch(loadTradeHistory(currentMarket.id));
     }

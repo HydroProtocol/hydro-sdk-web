@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import BigNumber from 'bignumber.js';
-import { loadAccountJwt } from '../../lib/session';
+import { loadAccountHydroAuthentication } from '../../lib/session';
 import { initOrderbook, updateOrderbook } from '../../actions/orderbook';
 import env from '../../lib/env';
 import { setConfigs } from '../../actions/config';
@@ -81,10 +81,11 @@ class WebsocketConnector extends React.PureComponent {
     if (this.lastSubscribedChannel) {
       const m = JSON.stringify({
         type: 'unsubscribe',
-        channels: [
-          { name: 'full', marketIds: [this.lastSubscribedChannel] },
-          { name: 'orderbook', marketIds: [this.lastSubscribedChannel] }
-        ]
+        channels: ['Market#' + marketId]
+        // channels: [
+        // { name: 'full', marketIds: [this.lastSubscribedChannel] },
+        // { name: 'orderbook', marketIds: [this.lastSubscribedChannel] }
+        // ]
       });
       this.sendMessage(m);
     }
@@ -92,17 +93,20 @@ class WebsocketConnector extends React.PureComponent {
     this.lastSubscribedChannel = marketId;
     const message = JSON.stringify({
       type: 'subscribe',
-      channels: [{ name: 'full', marketIds: [marketId] }, { name: 'orderbook', marketIds: [marketId] }]
+      channels: ['Market#' + marketId]
+      // channels: [{ name: 'full', marketIds: [marketId] }, { name: 'orderbook', marketIds: [marketId] }]
     });
     this.sendMessage(message);
   };
 
   logoutLastAccount = () => {
+    const { address } = this.props;
     if (this.lastAccountAddress) {
       const message = JSON.stringify({
-        type: 'accountLogout',
-        account: this.lastAccountAddress
+        type: 'unsubscribe',
+        channels: ['Account#' + address]
       });
+
       this.sendMessage(message);
       this.lastAccountAddress = null;
     }
@@ -116,18 +120,20 @@ class WebsocketConnector extends React.PureComponent {
       return;
     }
 
-    const jwt = loadAccountJwt(address);
+    const hydroAuthentication = loadAccountHydroAuthentication(address);
 
-    if (!jwt) {
+    if (!hydroAuthentication) {
       return;
     }
 
     this.lastAccountAddress = address;
 
     const message = JSON.stringify({
-      type: 'accountLogin',
-      account: address,
-      jwt
+      // type: 'accountLogin',
+      type: 'subscribe',
+      channels: ['Account#' + address]
+      // account: address,
+      // hydroAuthentication
     });
     this.sendMessage(message);
   };
@@ -140,7 +146,7 @@ class WebsocketConnector extends React.PureComponent {
 
   connectWebsocket = () => {
     const { dispatch } = this.props;
-    this.socket = new window.ReconnectingWebSocket(`${env.WS_ADDRESS}/v3`);
+    this.socket = new window.ReconnectingWebSocket(`${env.WS_ADDRESS}`);
     this.socket.debug = false;
     this.socket.timeoutInterval = 5400;
     this.socket.onopen = async event => {
@@ -175,17 +181,16 @@ class WebsocketConnector extends React.PureComponent {
           if (data.marketId !== currentMarket.id) {
             break;
           }
-          const bids = data.bids.map(priceLevel => [new BigNumber(priceLevel.price), new BigNumber(priceLevel.amount)]);
-          const asks = data.asks.map(priceLevel => [new BigNumber(priceLevel.price), new BigNumber(priceLevel.amount)]);
+
+          const bids = data.bids.map(priceLevel => [new BigNumber(priceLevel[0]), new BigNumber(priceLevel[1])]);
+          const asks = data.asks.map(priceLevel => [new BigNumber(priceLevel[0]), new BigNumber(priceLevel[1])]);
           dispatch(initOrderbook(bids, asks));
           break;
         case 'level2OrderbookUpdate':
           if (data.marketId !== currentMarket.id) {
             break;
           }
-          data.changes.forEach(change => {
-            dispatch(updateOrderbook(change.side, new BigNumber(change.price), new BigNumber(change.amount)));
-          });
+          dispatch(updateOrderbook(data.side, new BigNumber(data.price), new BigNumber(data.amount)));
           break;
         case 'orderUpdate':
           if (data.order.marketId === currentMarket.id) {

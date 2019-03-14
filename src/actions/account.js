@@ -1,5 +1,5 @@
 import { personalSign, getAllowance, getTokenBalance } from '../lib/web3';
-import { saveLoginData, loadAccountJwt } from '../lib/session';
+import { saveLoginData, loadAccountHydroAuthentication } from '../lib/session';
 import BigNumber from 'bignumber.js';
 import api from '../lib/api';
 
@@ -25,7 +25,7 @@ export const loadAccount = address => {
       payload: { address }
     });
     const isLoggedIn = getState().account.get('isLoggedIn');
-    const jwt = loadAccountJwt(address);
+    const jwt = loadAccountHydroAuthentication(address);
     if (jwt && !isLoggedIn) {
       dispatch(login(address, jwt));
     }
@@ -60,28 +60,20 @@ export const enableMetamask = () => {
 // request ddex private auth token
 export const loginRequest = address => {
   return async (dispatch, getState) => {
-    const message = `Signing this message proves your ownership of your Ethereum wallet address to DDEX without giving DDEX access to any sensitive information. Message ID: @${Date.now()}.`;
+    const message = 'HYDRO-AUTHENTICATION';
     const signature = await personalSign(message, address);
     if (!signature) {
       return;
     }
-    const res = await api.post('/account/jwt', null, {
-      headers: {
-        'Hydro-Authentication': address + '#' + message + '#' + signature
-      }
-    });
 
-    if (res.data.status === 0) {
-      const jwt = res.data.data.jwt;
-      return dispatch(login(address, jwt));
-    }
+    const hydroAuthentication = address + '#' + message + '#' + signature;
+    return dispatch(login(address, hydroAuthentication));
   };
 };
 
-export const login = (address, jwt) => {
+export const login = (address, hydroAuthentication) => {
   return (dispatch, getState) => {
-    // save jwt to localstorage
-    saveLoginData(address, jwt);
+    saveLoginData(address, hydroAuthentication);
     dispatch(loadAccountLockedBalance());
     dispatch({ type: 'LOGIN' });
   };
@@ -93,7 +85,7 @@ export const loadAccountLockedBalance = () => {
     const res = await api.get('/account/lockedBalances');
     const lockedBalances = {};
     if (res.data.status === 0) {
-      res.data.data.lockedBalances.forEach(x => {
+      res.data.data.forEach(x => {
         lockedBalances[x.symbol] = x.amount;
       });
       dispatch(updateTokenLockedBalances(lockedBalances));
@@ -114,44 +106,40 @@ export const updateTokenLockedBalances = lockedBalances => {
 
 // load ERC20 tokens balance and allowance
 export const loadTokens = () => {
-  try {
-    return async (dispatch, getState) => {
-      const state = getState();
-      const accountAddress = state.account.get('address');
+  return async (dispatch, getState) => {
+    const state = getState();
+    const accountAddress = state.account.get('address');
 
-      if (!accountAddress) {
-        return;
+    if (!accountAddress) {
+      return;
+    }
+
+    const markets = state.market.getIn(['markets', 'data']).toArray();
+    let tokens = {};
+    let promises = [];
+
+    // load quote tokens first
+    for (let i = 0; i < markets.length; i++) {
+      const market = markets[i];
+      if (tokens[market.quoteToken]) {
+        continue;
       }
+      tokens[market.quoteToken] = true;
+      promises.push(dispatch(loadToken(market.quoteTokenAddress, market.quoteToken, market.quoteTokenDecimals)));
+    }
 
-      const markets = state.market.getIn(['markets', 'data']).toArray();
-      let tokens = {};
-      let promises = [];
-
-      // load quote tokens first
-      for (let i = 0; i < markets.length; i++) {
-        const market = markets[i];
-        if (tokens[market.quoteToken]) {
-          continue;
-        }
-        tokens[market.quoteToken] = true;
-        promises.push(dispatch(loadToken(market.quoteTokenAddress, market.quoteToken, market.quoteTokenDecimals)));
+    // then base tokens
+    for (let i = 0; i < markets.length; i++) {
+      const market = markets[i];
+      if (tokens[market.baseToken]) {
+        continue;
       }
+      tokens[market.baseToken] = true;
+      promises.push(dispatch(loadToken(market.baseTokenAddress, market.baseToken, market.baseTokenDecimals)));
+    }
 
-      // then base tokens
-      for (let i = 0; i < markets.length; i++) {
-        const market = markets[i];
-        if (tokens[market.baseToken]) {
-          continue;
-        }
-        tokens[market.baseToken] = true;
-        promises.push(dispatch(loadToken(market.baseTokenAddress, market.baseToken, market.baseTokenDecimals)));
-      }
-
-      await Promise.all(promises);
-    };
-  } catch (e) {
-    alert(e);
-  }
+    await Promise.all(promises);
+  };
 };
 
 // load ERC20 token 10 times
@@ -191,7 +179,8 @@ export const loadToken = (tokenAddress, symbol, decimals) => {
 // load all my pending orders
 export const loadOrders = () => {
   return async (dispatch, getState) => {
-    const res = await api.get('/orders');
+    const currentMarket = getState().market.getIn(['markets', 'currentMarket']);
+    const res = await api.get(`/orders?marketId=${currentMarket.id}`);
 
     if (res.data.status === 0) {
       const data = res.data.data;
@@ -210,7 +199,8 @@ export const loadOrders = () => {
 // load all my trades
 export const loadTrades = () => {
   return async (dispatch, getState) => {
-    const res = await api.get('/markets/myALLTrades');
+    const currentMarket = getState().market.getIn(['markets', 'currentMarket']);
+    const res = await api.get(`/markets/${currentMarket.id}/trades/mine`);
 
     if (res.data.status === 0) {
       const data = res.data.data;

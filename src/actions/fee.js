@@ -6,10 +6,7 @@ import api from '../lib/api';
 export let hotDiscountRules = [];
 
 export const loadHotDiscountRules = async () => {
-  const res = await api.get('/fees/discountRules');
-  if (res.data.data) {
-    hotDiscountRules = res.data.data;
-  }
+  hotDiscountRules = [[5000, 1], [20000, 0.9], [100000, 0.8], [500000, 0.7], [2000000, 0.6], [-1, 0.5]];
 };
 
 export const getHotTokenAmount = () => {
