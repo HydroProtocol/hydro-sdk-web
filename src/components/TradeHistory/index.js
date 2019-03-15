@@ -38,7 +38,7 @@ class TradeHistory extends React.PureComponent {
               .toArray()
               .reverse()
               .map(([id, trade]) => {
-                const colorGreen = trade.side === 'buy';
+                const colorGreen = trade.takerSide === 'buy';
                 return (
                   <tr key={trade.id}>
                     <td className={[colorGreen ? 'text-success' : 'text-danger'].join(' ')}>

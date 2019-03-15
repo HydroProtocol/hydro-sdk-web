@@ -205,7 +205,7 @@ class WebsocketConnector extends React.PureComponent {
           }
           break;
         case 'newMarketTrade':
-          if (data.marketId !== currentMarket.id) {
+          if (data.trade.marketId !== currentMarket.id) {
             break;
           }
           dispatch(marketTrade(data.trade));

@@ -49,7 +49,12 @@ class Trades extends React.PureComponent {
               .toArray()
               .reverse()
               .map(([id, trade]) => {
-                const side = trade.buyer === address ? 'buy' : 'sell';
+                let side;
+                if (trade.taker === address) {
+                  side = trade.takerSide;
+                } else {
+                  side = trade.takerSide === 'buy' ? 'sell' : 'buy';
+                }
 
                 let status, className;
                 if (trade.status === 'successful') {
