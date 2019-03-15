@@ -86,7 +86,7 @@ export const loadAccountLockedBalance = () => {
     const lockedBalances = {};
     if (res.data.status === 0) {
       res.data.data.lockedBalances.forEach(x => {
-        lockedBalances[x.symbol] = x.amount;
+        lockedBalances[x.symbol] = x.lockedBalance;
       });
       dispatch(updateTokenLockedBalances(lockedBalances));
     }

@@ -7,6 +7,7 @@ import { trade } from '../../actions/trade';
 import BigNumber from 'bignumber.js';
 import { loadHotDiscountRules, getHotTokenAmount } from '../../actions/fee';
 import { calculateTrade } from '../../lib/tradeCalculator';
+import PerfectScrollbar from 'perfect-scrollbar';
 
 const mapStateToProps = state => {
   const selector = formValueSelector(TRADE_FORM_ID);
@@ -94,6 +95,7 @@ class Trade extends React.PureComponent {
       <div className="trade flex-1 flex-column">
         <ul className="nav nav-tabs border-0 bg-dark title column-center">
           <li className="nav-item">
+            {/* eslint-disable-next-line */}
             <a
               className={`pull-right text-secondary text-center${side === 'buy' ? ' active' : ''}`}
               onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'buy'))}>
@@ -101,6 +103,7 @@ class Trade extends React.PureComponent {
             </a>
           </li>
           <li className="nav-item">
+            {/* eslint-disable-next-line */}
             <a
               className={`pull-left text-secondary text-center${side === 'sell' ? ' active' : ''}`}
               onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'sell'))}>
@@ -108,18 +111,18 @@ class Trade extends React.PureComponent {
             </a>
           </li>
         </ul>
-        <div className="bg-grey flex-1">
+        <div className="bg-grey flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
           <form
             className="text-secondary flex-1"
-            style={{ margin: '12px auto 0', padding: '0 24px', maxWidth: 450 }}
+            style={{ margin: '12px auto', padding: '0 24px', maxWidth: 450 }}
             onSubmit={handleSubmit(() => this.submit())}>
-            <div className="form-group">
+            {/* <div className="form-group">
               <label>Order Type</label>
               <Field className="form-control" name="orderType" component={'select'}>
                 <option value="limit">Limit</option>
                 {currentMarket.supportedOrderTypes.indexOf('market') > -1 && <option value="market">Market</option>}
               </Field>
-            </div>
+            </div> */}
             {orderType === 'limit' && (
               <div className="form-group">
                 <label>Price</label>
@@ -268,6 +271,15 @@ class Trade extends React.PureComponent {
       change('marketOrderWorstPrice', marketOrderWorstPrice);
       change('marketOrderWorstTotalQuote', calculateWorstResult.totalQuoteTokens);
       change('marketOrderWorstTotalBase', calculateWorstResult.totalBaseTokens);
+    }
+  }
+
+  setRef(ref) {
+    if (ref) {
+      this.ps = new PerfectScrollbar(ref, {
+        suppressScrollX: true,
+        maxScrollbarLength: 20
+      });
     }
   }
 }

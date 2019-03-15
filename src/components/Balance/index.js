@@ -5,6 +5,7 @@ import { toUnitAmount, isTokenApproved } from '../../lib/utils';
 import BigNumber from 'bignumber.js';
 import { enable, disable } from '../../lib/web3';
 import Wrap from '../Wrap';
+import PerfectScrollbar from 'perfect-scrollbar';
 
 const mapStateToProps = state => {
   return {
@@ -36,7 +37,10 @@ class Balance extends React.PureComponent {
   render() {
     const { dispatch, tokensInfo, lockedBalances, ethBalance } = this.props;
     return (
-      <div className="balance flex-1 column-center text-secondary bg-grey" style={{ padding: 24 }}>
+      <div
+        className="balance flex-1 column-center text-secondary bg-grey position-relative overflow-hidden"
+        style={{ padding: 24 }}
+        ref={ref => this.setRef(ref)}>
         <table className="table table-dark bg-grey">
           <thead>
             <tr className="text-secondary">
@@ -61,21 +65,26 @@ class Balance extends React.PureComponent {
             </tr>
             {tokensInfo.toArray().map(([token, info]) => {
               const { address, balance, allowance, decimals } = info.toJS();
-              const lockedBalance = toUnitAmount(lockedBalances.get(token, new BigNumber('0')), decimals);
+              const lockedBalance = lockedBalances.get(token, new BigNumber('0'));
               const isApproved = isTokenApproved(allowance || new BigNumber('0'));
+              const availableBalance = toUnitAmount(
+                balance.minus(lockedBalance) || new BigNumber('0'),
+                decimals
+              ).toFixed(5);
+              const toolTipTitle = `<div>In-Order: ${toUnitAmount(lockedBalance, decimals).toFixed(
+                5
+              )}</div><div>Total: ${toUnitAmount(balance, decimals).toFixed(5)}</div>`;
               return (
                 <tr key={token}>
                   <td>{token}</td>
                   <td
+                    key={toolTipTitle}
                     data-html="true"
                     data-toggle="tooltip"
                     data-placement="top"
-                    title={`<div>In-Order: ${lockedBalance.toFixed(5)}</div><div>Total: ${toUnitAmount(
-                      balance,
-                      decimals
-                    ).toFixed(5)}</div>`}
+                    title={toolTipTitle}
                     ref={ref => window.$(ref).tooltip()}>
-                    {toUnitAmount(balance.minus(lockedBalance) || new BigNumber('0'), decimals).toFixed(5)}
+                    {availableBalance}
                   </td>
                   <td>
                     {isApproved ? (
@@ -106,6 +115,15 @@ class Balance extends React.PureComponent {
         <Wrap />
       </div>
     );
+  }
+
+  setRef(ref) {
+    if (ref) {
+      this.ps = new PerfectScrollbar(ref, {
+        suppressScrollX: true,
+        maxScrollbarLength: 20
+      });
+    }
   }
 }
 

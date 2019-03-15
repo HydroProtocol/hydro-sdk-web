@@ -82,10 +82,6 @@ class WebsocketConnector extends React.PureComponent {
       const m = JSON.stringify({
         type: 'unsubscribe',
         channels: ['Market#' + marketId]
-        // channels: [
-        // { name: 'full', marketIds: [this.lastSubscribedChannel] },
-        // { name: 'orderbook', marketIds: [this.lastSubscribedChannel] }
-        // ]
       });
       this.sendMessage(m);
     }
@@ -94,7 +90,6 @@ class WebsocketConnector extends React.PureComponent {
     const message = JSON.stringify({
       type: 'subscribe',
       channels: ['Market#' + marketId]
-      // channels: [{ name: 'full', marketIds: [marketId] }, { name: 'orderbook', marketIds: [marketId] }]
     });
     this.sendMessage(message);
   };
@@ -192,39 +187,28 @@ class WebsocketConnector extends React.PureComponent {
           }
           dispatch(updateOrderbook(data.side, new BigNumber(data.price), new BigNumber(data.amount)));
           break;
-        case 'orderUpdate':
+        case 'orderChange':
           if (data.order.marketId === currentMarket.id) {
             dispatch(orderUpdate(data.order));
           }
           break;
-        case 'balance':
+        case 'lockedBalanceChange':
           dispatch(
             updateTokenLockedBalances({
-              [data.symbol]: data.amount
+              [data.symbol]: data.balance
             })
           );
           break;
-        case 'tradeUpdate':
+        case 'tradeChange':
           if (data.trade.marketId === currentMarket.id) {
             dispatch(tradeUpdate(data.trade));
           }
           break;
-        case 'trade_success':
+        case 'newMarketTrade':
           if (data.marketId !== currentMarket.id) {
             break;
           }
-          const trade = {
-            id: data.id,
-            marketId: data.marketId,
-            amount: data.amount,
-            price: data.price,
-            status: 'successful',
-            side: data.makerSide === 'sell' ? 'buy' : 'sell',
-            executedAt: data.time,
-            createdAt: data.time
-          };
-          dispatch(marketTrade(trade));
-
+          dispatch(marketTrade(data.trade));
           if (address) {
             dispatch(watchToken(currentMarket.baseTokenAddress, currentMarket.baseToken));
             dispatch(watchToken(currentMarket.quoteTokenAddress, currentMarket.quoteToken));

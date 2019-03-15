@@ -6,9 +6,6 @@
  * }
  */
 
-// 5 minute expired margin
-const safeExpiredAtMargin = 5 * 60 * 1000;
-
 export const saveLoginData = (address, hydroAuthentication) => {
   window.localStorage.setItem(`loginData-${address}`, JSON.stringify({ address, hydroAuthentication }));
 };

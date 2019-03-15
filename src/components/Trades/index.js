@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { loadTrades } from '../../actions/account';
+import PerfectScrollbar from 'perfect-scrollbar';
 
 const mapStateToProps = state => {
   return {
@@ -19,16 +20,20 @@ class Trades extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const { isLoggedIn, dispatch } = this.props;
+    const { isLoggedIn, dispatch, trades } = this.props;
     if (isLoggedIn && isLoggedIn !== prevProps.isLoggedIn) {
       dispatch(loadTrades());
+    }
+
+    if (trades !== prevProps.trades) {
+      this.ps && this.ps.update();
     }
   }
 
   render() {
     const { trades, address } = this.props;
     return (
-      <div className="trades flex-1 bg-grey col-12">
+      <div className="trades flex-1 bg-grey col-12 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
         <table className="table table-dark bg-grey">
           <thead>
             <tr className="text-secondary">
@@ -58,7 +63,7 @@ class Trades extends React.PureComponent {
                 }
                 return (
                   <tr key={id}>
-                    <td>{trade.pair}</td>
+                    <td>{trade.marketId}</td>
                     <td className={`${side === 'sell' ? 'text-danger' : 'text-success'}`}>{side}</td>
                     <td className={`text-right${side === 'sell' ? ' text-danger' : ' text-success'}`}>{trade.price}</td>
                     <td className="text-right">{trade.amount}</td>
@@ -70,6 +75,15 @@ class Trades extends React.PureComponent {
         </table>
       </div>
     );
+  }
+
+  setRef(ref) {
+    if (ref) {
+      this.ps = new PerfectScrollbar(ref, {
+        suppressScrollX: true,
+        maxScrollbarLength: 20
+      });
+    }
   }
 }
 

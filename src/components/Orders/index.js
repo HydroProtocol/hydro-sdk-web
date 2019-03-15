@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PerfectScrollbar from 'perfect-scrollbar';
 import { loadOrders, cancelOrder } from '../../actions/account';
 
 const mapStateToProps = state => {
@@ -18,16 +19,19 @@ class Orders extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const { isLoggedIn, dispatch } = this.props;
+    const { isLoggedIn, dispatch, orders } = this.props;
     if (isLoggedIn && isLoggedIn !== prevProps.isLoggedIn) {
       dispatch(loadOrders());
+    }
+    if (orders !== prevProps.orders) {
+      this.ps && this.ps.update();
     }
   }
 
   render() {
     const { orders, dispatch } = this.props;
     return (
-      <div className="orders flex-1 bg-grey col-12">
+      <div className="orders flex-1 bg-grey position-relative overflow-hidden col-12" ref={ref => this.setRef(ref)}>
         <table className="table table-dark bg-grey">
           <thead>
             <tr className="text-secondary">
@@ -67,6 +71,15 @@ class Orders extends React.PureComponent {
         </table>
       </div>
     );
+  }
+
+  setRef(ref) {
+    if (ref) {
+      this.ps = new PerfectScrollbar(ref, {
+        suppressScrollX: true,
+        maxScrollbarLength: 20
+      });
+    }
   }
 }
 

@@ -1,7 +1,6 @@
 import { setConfigs } from './config';
 import { getTokenBalance } from '../lib/web3';
 import env from '../lib/env';
-import api from '../lib/api';
 
 export let hotDiscountRules = [];
 
