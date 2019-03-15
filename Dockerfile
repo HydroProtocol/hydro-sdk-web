@@ -5,10 +5,9 @@ ARG REACT_APP_WS_ADDRESS
 ARG REACT_APP_HYDRO_PROXY_ADDRESS
 ARG REACT_APP_HOT_CONTRACT_ADDRESS
 
-RUN mkdir -p /app/starter-kit-web
+COPY . /app/starter-kit-web
 WORKDIR /app/starter-kit-web
 
-COPY . /app/starter-kit-web
 RUN yarn install
 RUN yarn run build
 
