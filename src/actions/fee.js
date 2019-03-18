@@ -10,7 +10,7 @@ export const loadHotDiscountRules = async () => {
 
 export const getHotTokenAmount = () => {
   return async (dispatch, getState) => {
-    const hotContract = env.HOT_CONTRACT_ADDRESS;
+    const hotContract = env.HYDRO_TOKEN_ADDRESS;
     if (!hotContract) {
       return;
     }
