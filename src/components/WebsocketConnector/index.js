@@ -99,7 +99,7 @@ class WebsocketConnector extends React.PureComponent {
     if (this.lastAccountAddress) {
       const message = JSON.stringify({
         type: 'unsubscribe',
-        channels: ['Account#' + address]
+        channels: ['TraderAddress#' + address]
       });
 
       this.sendMessage(message);
@@ -126,7 +126,7 @@ class WebsocketConnector extends React.PureComponent {
     const message = JSON.stringify({
       // type: 'accountLogin',
       type: 'subscribe',
-      channels: ['Account#' + address]
+      channels: ['TraderAddress#' + address]
       // account: address,
       // hydroAuthentication
     });
