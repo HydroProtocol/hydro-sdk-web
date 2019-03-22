@@ -33,7 +33,7 @@ const createOrder = (side, price, amount, orderType, expires) => {
       side,
       expires,
       orderType,
-      marketId: currentMarket.id
+      marketID: currentMarket.id
     });
 
     if (buildOrderResponse.data.status !== 0) {
@@ -41,12 +41,12 @@ const createOrder = (side, price, amount, orderType, expires) => {
     }
 
     const orderParams = buildOrderResponse.data.data.order;
-    const { id: orderId } = orderParams;
+    const { id: orderID } = orderParams;
     try {
-      const signature = await personalSign(orderId, address);
+      const signature = await personalSign(orderID, address);
       const orderSignature = '0x' + signature.slice(130) + '0'.repeat(62) + signature.slice(2, 130);
       const placeOrderResponse = await api.post('/orders', {
-        orderId,
+        orderID,
         signature: orderSignature,
         method: 0
       });

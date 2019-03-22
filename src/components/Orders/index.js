@@ -50,10 +50,10 @@ class Orders extends React.PureComponent {
                 if (order.availableAmount.eq(0)) {
                   return null;
                 }
-                const symbol = order.marketId.split('-')[0];
+                const symbol = order.marketID.split('-')[0];
                 return (
                   <tr key={id}>
-                    <td>{order.marketId}</td>
+                    <td>{order.marketID}</td>
                     <td className={order.side === 'sell' ? 'text-danger' : 'text-success'}>{order.side}</td>
                     <td className="text-right">{order.price.toFixed()}</td>
                     <td className="text-right">

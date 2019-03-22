@@ -25,11 +25,11 @@ export const loadMarkets = () => {
 };
 
 // load current market trade history
-export const loadTradeHistory = marketId => {
+export const loadTradeHistory = marketID => {
   return async (dispatch, getState) => {
-    const res = await api.get(`/markets/${marketId}/trades`);
+    const res = await api.get(`/markets/${marketID}/trades`);
     const currentMarket = getState().market.getIn(['markets', 'currentMarket']);
-    if (currentMarket.id === marketId) {
+    if (currentMarket.id === marketID) {
       return dispatch({
         type: 'LOAD_TRADE_HISTORY',
         payload: res.data.data.trades
