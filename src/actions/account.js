@@ -180,7 +180,7 @@ export const loadToken = (tokenAddress, symbol, decimals) => {
 export const loadOrders = () => {
   return async (dispatch, getState) => {
     const currentMarket = getState().market.getIn(['markets', 'currentMarket']);
-    const res = await api.get(`/orders?marketId=${currentMarket.id}`);
+    const res = await api.get(`/orders?marketID=${currentMarket.id}`);
 
     if (res.data.status === 0) {
       const data = res.data.data;
@@ -243,7 +243,7 @@ export const cancelOrder = id => {
 const format = json => {
   return {
     id: json.id,
-    marketId: json.marketId,
+    marketID: json.marketID,
     side: json.side,
     status: json.status,
     gasFeeAmount: new BigNumber(json.gasFeeAmount || 0),

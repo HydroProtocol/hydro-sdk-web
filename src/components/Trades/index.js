@@ -68,7 +68,7 @@ class Trades extends React.PureComponent {
                 }
                 return (
                   <tr key={id}>
-                    <td>{trade.marketId}</td>
+                    <td>{trade.marketID}</td>
                     <td className={`${side === 'sell' ? 'text-danger' : 'text-success'}`}>{side}</td>
                     <td className={`text-right${side === 'sell' ? ' text-danger' : ' text-success'}`}>{trade.price}</td>
                     <td className="text-right">{trade.amount}</td>

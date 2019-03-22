@@ -77,19 +77,19 @@ class WebsocketConnector extends React.PureComponent {
     this.socket.send(message);
   };
 
-  changeMarket = marketId => {
+  changeMarket = marketID => {
     if (this.lastSubscribedChannel) {
       const m = JSON.stringify({
         type: 'unsubscribe',
-        channels: ['Market#' + marketId]
+        channels: ['Market#' + marketID]
       });
       this.sendMessage(m);
     }
 
-    this.lastSubscribedChannel = marketId;
+    this.lastSubscribedChannel = marketID;
     const message = JSON.stringify({
       type: 'subscribe',
-      channels: ['Market#' + marketId]
+      channels: ['Market#' + marketID]
     });
     this.sendMessage(message);
   };
@@ -173,7 +173,7 @@ class WebsocketConnector extends React.PureComponent {
       const { currentMarket, address } = this.props;
       switch (data.type) {
         case 'level2OrderbookSnapshot':
-          if (data.marketId !== currentMarket.id) {
+          if (data.marketID !== currentMarket.id) {
             break;
           }
 
@@ -182,13 +182,13 @@ class WebsocketConnector extends React.PureComponent {
           dispatch(initOrderbook(bids, asks));
           break;
         case 'level2OrderbookUpdate':
-          if (data.marketId !== currentMarket.id) {
+          if (data.marketID !== currentMarket.id) {
             break;
           }
           dispatch(updateOrderbook(data.side, new BigNumber(data.price), new BigNumber(data.amount)));
           break;
         case 'orderChange':
-          if (data.order.marketId === currentMarket.id) {
+          if (data.order.marketID === currentMarket.id) {
             dispatch(orderUpdate(data.order));
           }
           break;
@@ -200,12 +200,12 @@ class WebsocketConnector extends React.PureComponent {
           );
           break;
         case 'tradeChange':
-          if (data.trade.marketId === currentMarket.id) {
+          if (data.trade.marketID === currentMarket.id) {
             dispatch(tradeUpdate(data.trade));
           }
           break;
         case 'newMarketTrade':
-          if (data.trade.marketId !== currentMarket.id) {
+          if (data.trade.marketID !== currentMarket.id) {
             break;
           }
           dispatch(marketTrade(data.trade));

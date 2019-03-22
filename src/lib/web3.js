@@ -38,10 +38,10 @@ export const wrapETH = amount => {
     };
 
     try {
-      const transactionId = await callPromise(web3.eth.sendTransaction, params);
+      const transactionID = await callPromise(web3.eth.sendTransaction, params);
 
       alert(`Wrap ETH request submitted`);
-      watchTransactionStatus(transactionId, async success => {
+      watchTransactionStatus(transactionID, async success => {
         if (success) {
           dispatch(watchToken(WETH.address, WETH.symbol));
           alert('Wrap ETH Successfully');
@@ -49,7 +49,7 @@ export const wrapETH = amount => {
           alert('Wrap ETH Failed');
         }
       });
-      return transactionId;
+      return transactionID;
     } catch (e) {
       alert(e);
     }
@@ -74,10 +74,10 @@ export const unwrapWETH = amount => {
     };
 
     try {
-      const transactionId = await callPromise(web3.eth.sendTransaction, params);
+      const transactionID = await callPromise(web3.eth.sendTransaction, params);
 
       alert(`Unwrap WETH request submitted`);
-      watchTransactionStatus(transactionId, async success => {
+      watchTransactionStatus(transactionID, async success => {
         if (success) {
           dispatch(watchToken(WETH.address, WETH.symbol));
           alert('Wrap ETH Successfully');
@@ -85,7 +85,7 @@ export const unwrapWETH = amount => {
           alert('Wrap ETH Failed');
         }
       });
-      return transactionId;
+      return transactionID;
     } catch (e) {
       alert(e);
     }
@@ -128,10 +128,10 @@ export const approve = (tokenAddress, symbol, allowance, action) => {
     };
 
     try {
-      const transactionId = await callPromise(web3.eth.sendTransaction, params);
+      const transactionID = await callPromise(web3.eth.sendTransaction, params);
 
       alert(`${status} ${symbol} request submitted`);
-      watchTransactionStatus(transactionId, async success => {
+      watchTransactionStatus(transactionID, async success => {
         if (success) {
           dispatch(watchToken(tokenAddress, symbol));
           alert(`${status} ${symbol} Successfully`);
@@ -139,7 +139,7 @@ export const approve = (tokenAddress, symbol, allowance, action) => {
           alert(`${status} ${symbol} Failed`);
         }
       });
-      return transactionId;
+      return transactionID;
     } catch (e) {
       alert(e);
     }
@@ -154,11 +154,11 @@ export const initWatchers = () => {
   };
 };
 
-const watchTransactionStatus = (txId, callback) => {
+const watchTransactionStatus = (txID, callback) => {
   const getTransaction = () => {
-    web3.eth.getTransactionReceipt(txId, (err, result) => {
+    web3.eth.getTransactionReceipt(txID, (err, result) => {
       if (!result) {
-        window.setTimeout(getTransaction(txId), 3000);
+        window.setTimeout(getTransaction(txID), 3000);
       } else if (callback) {
         callback(result.status === '0x1');
       } else {
@@ -166,7 +166,7 @@ const watchTransactionStatus = (txId, callback) => {
       }
     });
   };
-  window.setTimeout(getTransaction(txId), 3000);
+  window.setTimeout(getTransaction(txID), 3000);
 };
 
 const loadMetamask = () => {
