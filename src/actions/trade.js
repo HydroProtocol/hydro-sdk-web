@@ -16,6 +16,7 @@ export const trade = (side, price, amount, orderType = 'limit', expires = 86400 
     } catch (e) {
       alert(e);
     }
+
     return false;
   };
 };
@@ -38,13 +39,15 @@ const createOrder = (side, price, amount, orderType, expires) => {
     if (buildOrderResponse.data.status !== 0) {
       return buildOrderResponse.data;
     }
+
     const orderParams = buildOrderResponse.data.data.order;
     const { id: orderId } = orderParams;
     try {
       const signature = await personalSign(orderId, address);
+      const orderSignature = '0x' + signature.slice(130) + '0'.repeat(62) + signature.slice(2, 130);
       const placeOrderResponse = await api.post('/orders', {
         orderId,
-        signature,
+        signature: orderSignature,
         method: 0
       });
 
