@@ -11,5 +11,5 @@ WORKDIR /app/starter-kit-web
 RUN yarn install
 RUN yarn run build
 
-FROM nginx:alpine
-COPY --from=build /app/starter-kit-web/build /usr/share/nginx/html
+FROM pierrezemb/gostatic:latest
+COPY --from=build /app/starter-kit-web/build /srv/http
