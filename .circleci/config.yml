@@ -1,0 +1,15 @@
+version: 2
+jobs:
+  build:
+    branches:
+      only:
+        - master
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Docker Build
+          command: |
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+            docker build -t wangleiddex/starter-kit-web .
+            docker push wangleiddex/starter-kit-web
