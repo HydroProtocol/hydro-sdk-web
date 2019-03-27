@@ -1,7 +1,8 @@
-Hydro Starter Kit Backend
+# Hydro Starter Kit Frontend
 
-[![CircleCI](https://circleci.com/gh/starter-kit-beta/starter-kit-backend.svg?style=svg)](https://circleci.com/gh/starter-kit-beta/starter-kit-backend)
+[![CircleCI](https://circleci.com/gh/starter-kit-beta/starter-kit-web.svg?style=svg)](https://circleci.com/gh/starter-kit-beta/starter-kit-web)
 
 ```
-go mod download
+yarn install
+yarn start
 ```
