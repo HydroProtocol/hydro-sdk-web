@@ -4,12 +4,12 @@ jobs:
     branches:
       only:
         - master
-    machine: true
+    docker:
+      - image: circleci/node:11
     steps:
       - checkout
       - run:
-          name: Docker Build
+          name: run ESLint
           command: |
-            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-            docker build -t wangleiddex/starter-kit-web .
-            docker push wangleiddex/starter-kit-web
+            yarn install
+            yarn eslint
