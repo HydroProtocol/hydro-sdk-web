@@ -22,10 +22,8 @@ class TradeHistory extends React.PureComponent {
   render() {
     const { tradeHistory, currentMarket } = this.props;
     return (
-      <div
-        className="trade-history flex-1 position-relative overflow-hidden bg-grey col-12"
-        ref={ref => this.setRef(ref)}>
-        <table className="table table-dark table-hover table-sm bg-grey">
+      <div className="trade-history flex-1 position-relative overflow-hidden col-12" ref={ref => this.setRef(ref)}>
+        <table className="table table-light table-hover table-sm">
           <thead>
             <tr className="text-secondary">
               <th>Price</th>

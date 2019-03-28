@@ -31,8 +31,8 @@ class Orders extends React.PureComponent {
   render() {
     const { orders, dispatch } = this.props;
     return (
-      <div className="orders flex-1 bg-grey position-relative overflow-hidden col-12" ref={ref => this.setRef(ref)}>
-        <table className="table table-dark bg-grey">
+      <div className="orders flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
+        <table className="table table-light">
           <thead>
             <tr className="text-secondary">
               <th>Pair</th>

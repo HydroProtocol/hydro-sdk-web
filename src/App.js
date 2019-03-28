@@ -49,38 +49,37 @@ class App extends React.PureComponent {
         <WebsocketConnector />
         <Header />
         <div className="flex flex-1">
-          <div className="grid">
-            <div className="title text-secondary">Orderbook</div>
-            <OrderBook />
+          <div className="flex">
+            <div className="grid border-right">
+              <div className="title">
+                <div>{currentMarket.id}</div>
+                <div className="text-secondary">Make a Limit Order</div>
+              </div>
+              <Trade />
+            </div>
+            <div className="grid border-right">
+              <div className="title">
+                <div>Orderbook</div>
+                <div className="text-secondary">Available Bid and Ask orders</div>
+              </div>
+              <OrderBook />
+            </div>
           </div>
           <div className="flex-column flex-1">
-            <div className="flex flex-1">
-              <div className="grid flex-1">
-                <div className="flex flex-1">
-                  <Trade />
-                </div>
+            <div className="grid flex-1">
+              <div className="title">
+                <div>Charts</div>
+                <div className="text-secondary">Recent trading patterns</div>
               </div>
-              <div className="grid flex-1">
-                <div className="title text-secondary">Wallet Balance</div>
-                <div className="flex flex-1">
-                  <Balance />
-                </div>
-              </div>
+              <Orders />
             </div>
-            <div className="flex flex-1">
-              <div className="grid flex-1">
-                <div className="title text-secondary">Orders</div>
-                <Orders />
+            <div className="grid flex-1 border-top">
+              <div className="title">
+                <div>Orders</div>
+                <div className="text-secondary">View your open orders</div>
               </div>
-              <div className="grid flex-1">
-                <div className="title text-secondary">Trades</div>
-                <Trades />
-              </div>
+              <Orders />
             </div>
-          </div>
-          <div className="grid">
-            <div className="title text-secondary">Trade History</div>
-            <TradeHistory />
           </div>
         </div>
       </div>

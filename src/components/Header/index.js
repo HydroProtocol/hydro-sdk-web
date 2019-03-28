@@ -20,7 +20,7 @@ class Header extends React.PureComponent {
   render() {
     const { currentMarket, markets, dispatch } = this.props;
     return (
-      <div className="navbar bg-black navbar-expand-lg">
+      <div className="navbar bg-blue navbar-expand-lg">
         <img className="navbar-brand" src={require('../../images/hydro.svg')} alt="hydro" />
         <div className="dropdown navbar-nav mr-auto">
           <button
