@@ -8,6 +8,7 @@ import BigNumber from 'bignumber.js';
 import { loadHotDiscountRules, getHotTokenAmount } from '../../actions/fee';
 import { calculateTrade } from '../../lib/tradeCalculator';
 import PerfectScrollbar from 'perfect-scrollbar';
+import './styles.scss';
 
 const mapStateToProps = state => {
   const selector = formValueSelector(TRADE_FORM_ID);
@@ -74,56 +75,36 @@ class Trade extends React.PureComponent {
   }
 
   render() {
-    const {
-      dispatch,
-      side,
-      handleSubmit,
-      currentMarket,
-      orderType,
-      marketOrderWorstTotalBase,
-      marketOrderWorstTotalQuote,
-      total,
-      totalBase,
-      gasFee,
-      tradeFee
-    } = this.props;
+    const { dispatch, side, handleSubmit, currentMarket, total, gasFee, tradeFee } = this.props;
     if (!currentMarket) {
       return null;
     }
 
     return (
-      <div className="trade flex-1 flex-column">
-        <ul className="nav nav-tabs border-0 bg-dark title column-center">
-          <li className="nav-item">
-            {/* eslint-disable-next-line */}
-            <a
-              className={`pull-right text-secondary text-center${side === 'buy' ? ' active' : ''}`}
-              onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'buy'))}>
-              Buy
-            </a>
-          </li>
-          <li className="nav-item">
-            {/* eslint-disable-next-line */}
-            <a
-              className={`pull-left text-secondary text-center${side === 'sell' ? ' active' : ''}`}
-              onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'sell'))}>
-              Sell
-            </a>
-          </li>
-        </ul>
-        <div className="bg-grey flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
-          <form
-            className="text-secondary flex-1"
-            style={{ margin: '12px auto', padding: '0 24px', maxWidth: 450 }}
-            onSubmit={handleSubmit(() => this.submit())}>
-            {/* <div className="form-group">
-              <label>Order Type</label>
-              <Field className="form-control" name="orderType" component={'select'}>
-                <option value="limit">Limit</option>
-                {currentMarket.supportedOrderTypes.indexOf('market') > -1 && <option value="market">Market</option>}
-              </Field>
-            </div> */}
-            {orderType === 'limit' && (
+      <>
+        <div className="title">
+          <div>{currentMarket.id}</div>
+          <div className="text-secondary">Make a Limit Order</div>
+        </div>
+        <div className="trade flex-1 flex-column">
+          <ul className="nav nav-tabs">
+            <li className="nav-item flex-1 flex">
+              <div
+                className={`flex-1 trade-tab text-secondary text-center${side === 'buy' ? ' active' : ''}`}
+                onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'buy'))}>
+                Buy
+              </div>
+            </li>
+            <li className="nav-item flex-1 flex">
+              <div
+                className={`flex-1 trade-tab text-secondary text-center${side === 'sell' ? ' active' : ''}`}
+                onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'sell'))}>
+                Sell
+              </div>
+            </li>
+          </ul>
+          <div className="flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
+            <form className="text-secondary flex-1" onSubmit={handleSubmit(() => this.submit())}>
               <div className="form-group">
                 <label>Price</label>
                 <div className="input-group">
@@ -133,54 +114,35 @@ class Trade extends React.PureComponent {
                   </div>
                 </div>
               </div>
-            )}
-            <div className="form-group">
-              <label>Amount</label>
-              <div className="input-group">
-                <Field name="amount" className="form-control" component={'input'} />
-                <div className="input-group-append">
-                  <span className="input-group-text">
-                    {side === 'buy' && orderType === 'market' ? currentMarket.quoteToken : currentMarket.baseToken}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="form-group">
-              {orderType === 'market' && (
-                <div className="flex">
-                  <div className="flex-grow-1" />
-                  <div className="text-white">
-                    Minimum TotalAmount ≈{' '}
-                    {side === 'buy'
-                      ? `${marketOrderWorstTotalBase.toFixed(currentMarket.amountDecimals)} ${currentMarket.baseToken}`
-                      : `${marketOrderWorstTotalQuote.toFixed(currentMarket.amountDecimals)} ${
-                          currentMarket.quoteToken
-                        }`}
+              <div className="form-group">
+                <label>Amount</label>
+                <div className="input-group">
+                  <Field name="amount" className="form-control" component={'input'} />
+                  <div className="input-group-append">
+                    <span className="input-group-text">{currentMarket.baseToken}</span>
                   </div>
                 </div>
-              )}
-              <div className="flex" style={{ marginBottom: 6 }}>
-                <div className="flex-grow-1">Total</div>
-                <div className="text-white">
-                  Fee ≈ {gasFee.plus(tradeFee).toFixed(currentMarket.priceDecimals)} {currentMarket.quoteToken}
-                </div>
               </div>
-              <input
-                className="form-control"
-                value={
-                  orderType === 'market' && side === 'buy'
-                    ? `${totalBase.toFixed(currentMarket.amountDecimals)} ${currentMarket.baseToken}`
-                    : `${total.toFixed(currentMarket.priceDecimals)} ${currentMarket.quoteToken}`
-                }
-                disabled
-              />
-            </div>
-            <button type="submit" className={`form-control btn ${side === 'buy' ? 'btn-success' : 'btn-danger'}`}>
-              {side} {currentMarket.baseToken}
-            </button>
-          </form>
+              <div className="form-group">
+                <div className="flex" style={{ marginBottom: 6 }}>
+                  <div className="flex-grow-1">Total</div>
+                  <div className="text-secondary">
+                    Fee ≈ {gasFee.plus(tradeFee).toFixed(currentMarket.priceDecimals)} {currentMarket.quoteToken}
+                  </div>
+                </div>
+                <input
+                  className="form-control"
+                  value={`${total.toFixed(currentMarket.priceDecimals)} ${currentMarket.quoteToken}`}
+                  disabled
+                />
+              </div>
+              <button type="submit" className={`form-control btn ${side === 'buy' ? 'btn-success' : 'btn-danger'}`}>
+                {side} {currentMarket.baseToken}
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -194,17 +156,7 @@ class Trade extends React.PureComponent {
   }
 
   updateFees(prevProps) {
-    const {
-      currentMarket,
-      orderType,
-      side,
-      price,
-      amount,
-      hotTokenAmount,
-      change,
-      bestAskPrice,
-      bestBidPrice
-    } = this.props;
+    const { currentMarket, orderType, side, price, amount, hotTokenAmount, change } = this.props;
 
     if (
       orderType === prevProps.orderType &&
@@ -215,25 +167,12 @@ class Trade extends React.PureComponent {
     ) {
       return;
     }
-    const {
-      asMakerFeeRate,
-      asTakerFeeRate,
-      gasFeeAmount,
-      marketOrderMaxSlippage,
-      pricePrecision,
-      priceDecimals,
-      amountDecimals
-    } = currentMarket;
+    const { asMakerFeeRate, asTakerFeeRate, gasFeeAmount, priceDecimals, amountDecimals } = currentMarket;
 
     const calculateParam = {
       orderType,
       side,
-      price:
-        orderType === 'market'
-          ? side === 'sell'
-            ? bestBidPrice || new BigNumber(0)
-            : bestAskPrice || new BigNumber(0)
-          : new BigNumber(price),
+      price: new BigNumber(price),
       amount: new BigNumber(amount),
       hotTokenAmount,
       gasFeeAmount,
@@ -253,25 +192,6 @@ class Trade extends React.PureComponent {
     change('gasFee', calculateResult.gasFeeAmount);
     change('hotDiscount', calculateResult.hotDiscount);
     change('tradeFee', calculateResult.tradeFeeAfterDiscount);
-
-    if (orderType === 'market') {
-      let marketOrderWorstPrice;
-
-      const rate =
-        side === 'buy'
-          ? (marketOrderWorstPrice = new BigNumber(1).plus(marketOrderMaxSlippage))
-          : (marketOrderWorstPrice = new BigNumber(1).minus(marketOrderMaxSlippage));
-
-      marketOrderWorstPrice = new BigNumber(rate.multipliedBy(calculateParam.price).toPrecision(pricePrecision)).dp(
-        priceDecimals,
-        BigNumber.ROUND_DOWN
-      );
-
-      const calculateWorstResult = calculateTrade({ ...calculateParam, price: marketOrderWorstPrice });
-      change('marketOrderWorstPrice', marketOrderWorstPrice);
-      change('marketOrderWorstTotalQuote', calculateWorstResult.totalQuoteTokens);
-      change('marketOrderWorstTotalBase', calculateWorstResult.totalBaseTokens);
-    }
   }
 
   setRef(ref) {

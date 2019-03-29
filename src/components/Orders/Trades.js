@@ -33,15 +33,15 @@ class Trades extends React.PureComponent {
   render() {
     const { trades, address } = this.props;
     return (
-      <div className="trades flex-1 bg-grey col-12 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
-        <table className="table table-dark bg-grey">
+      <div className="trades flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
+        <table className="table table-light">
           <thead>
             <tr className="text-secondary">
               <th>Pair</th>
               <th>Side</th>
               <th className="text-right">Price</th>
               <th className="text-right">Amount</th>
-              <th>Status</th>
+              <th className="text-right">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -56,14 +56,15 @@ class Trades extends React.PureComponent {
                   side = trade.takerSide === 'buy' ? 'sell' : 'buy';
                 }
 
-                let status, className;
+                let status;
+                let className = 'text-right ';
                 if (trade.status === 'successful') {
                   status = <i className="fa fa-check" aria-hidden="true" />;
-                  className = 'text-success';
+                  className += 'text-success';
                 } else if (trade.status === 'pending') {
                   status = <i className="fa fa-circle-o-notch fa-spin" aria-hidden="true" />;
                 } else {
-                  className = 'text-danger';
+                  className += 'text-danger';
                   status = <i className="fa fa-close" aria-hidden="true" />;
                 }
                 return (

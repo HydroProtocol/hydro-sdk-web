@@ -1,86 +1,38 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import PerfectScrollbar from 'perfect-scrollbar';
-import { loadOrders, cancelOrder } from '../../actions/account';
+import OpenOrders from './OpenOrders';
+import Trades from './Trades';
+import Selector from '../Selector';
 
-const mapStateToProps = state => {
-  return {
-    orders: state.account.get('orders'),
-    isLoggedIn: state.account.get('isLoggedIn')
-  };
-};
+const OPTIONS = [{ value: 'openOrders', name: 'Open' }, { value: 'filled', name: 'Filled' }];
 
 class Orders extends React.PureComponent {
-  componentDidMount() {
-    const { isLoggedIn, dispatch } = this.props;
-    if (isLoggedIn) {
-      dispatch(loadOrders());
-    }
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedType: 'openOrders'
+    };
   }
-
-  componentDidUpdate(prevProps) {
-    const { isLoggedIn, dispatch, orders } = this.props;
-    if (isLoggedIn && isLoggedIn !== prevProps.isLoggedIn) {
-      dispatch(loadOrders());
-    }
-    if (orders !== prevProps.orders) {
-      this.ps && this.ps.update();
-    }
-  }
-
   render() {
-    const { orders, dispatch } = this.props;
+    const { selectedType } = this.state;
     return (
-      <div className="orders flex-1 bg-grey position-relative overflow-hidden col-12" ref={ref => this.setRef(ref)}>
-        <table className="table table-dark bg-grey">
-          <thead>
-            <tr className="text-secondary">
-              <th>Pair</th>
-              <th>Side</th>
-              <th className="text-right">Price</th>
-              <th className="text-right">Amount</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {orders
-              .toArray()
-              .reverse()
-              .map(([id, order]) => {
-                if (order.availableAmount.eq(0)) {
-                  return null;
-                }
-                const symbol = order.marketID.split('-')[0];
-                return (
-                  <tr key={id}>
-                    <td>{order.marketID}</td>
-                    <td className={order.side === 'sell' ? 'text-danger' : 'text-success'}>{order.side}</td>
-                    <td className="text-right">{order.price.toFixed()}</td>
-                    <td className="text-right">
-                      {order.availableAmount.toFixed()} {symbol}
-                    </td>
-                    <td className="text-right">
-                      <button className="btn btn-outline-danger" onClick={() => dispatch(cancelOrder(order.id))}>
-                        Cancel
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table>
-      </div>
+      <>
+        <div className="title flex justify-content-between align-items-center">
+          <div>
+            <div>Orders</div>
+            <div className="text-secondary">View your open orders</div>
+          </div>
+          <Selector
+            options={OPTIONS}
+            selectedValue={selectedType}
+            handleClick={option => {
+              this.setState({ selectedType: option.value });
+            }}
+          />
+        </div>
+        {selectedType === 'openOrders' ? <OpenOrders /> : <Trades />}
+      </>
     );
-  }
-
-  setRef(ref) {
-    if (ref) {
-      this.ps = new PerfectScrollbar(ref, {
-        suppressScrollX: true,
-        maxScrollbarLength: 20
-      });
-    }
   }
 }
 
-export default connect(mapStateToProps)(Orders);
+export default Orders;

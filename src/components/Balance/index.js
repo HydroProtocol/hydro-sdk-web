@@ -38,10 +38,10 @@ class Balance extends React.PureComponent {
     const { dispatch, tokensInfo, lockedBalances, ethBalance } = this.props;
     return (
       <div
-        className="balance flex-1 column-center text-secondary bg-grey position-relative overflow-hidden"
+        className="balance flex-1 column-center text-secondary position-relative overflow-hidden"
         style={{ padding: 24 }}
         ref={ref => this.setRef(ref)}>
-        <table className="table table-dark bg-grey">
+        <table className="table table-light">
           <thead>
             <tr className="text-secondary">
               <td>Token</td>

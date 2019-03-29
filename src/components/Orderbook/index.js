@@ -41,52 +41,58 @@ class OrderBook extends React.Component {
     let { bids, asks, websocketConnected, currentMarket } = this.props;
 
     return (
-      <div className="orderbook bg-grey text-white">
-        <div className="flex header text-secondary">
-          <div className="col-6">Price</div>
-          <div className="col-6">Amount</div>
+      <>
+        <div className="title">
+          <div>Orderbook</div>
+          <div className="text-secondary">Available Bid and Ask orders</div>
         </div>
-        <div style={{ height: '100%' }}>
-          <div className="asks flex flex-column flex-column-reverse">
-            {asks
-              .slice(-20)
-              .reverse()
-              .toArray()
-              .map(([price, amount]) => {
-                return (
-                  <div className="flex" key={price.toString()} style={{ height: '5%' }}>
-                    <div className="col-6 text-danger">{price.toFixed(currentMarket.priceDecimals)}</div>
-                    <div className="col-6 orderbook-amount">{amount.toFixed(currentMarket.amountDecimals)}</div>
-                  </div>
-                );
-              })}
+        <div className="orderbook text-white">
+          <div className="flex header text-secondary">
+            <div className="col-6">Price</div>
+            <div className="col-6">Amount</div>
           </div>
-          <div className="status">
-            {websocketConnected ? (
-              <strong className="col-6 text-success">
-                <i className="fa fa-circle" aria-hidden="true" /> RealTime
-              </strong>
-            ) : (
-              <strong className="col-6 text-danger">
-                <i className="fa fa-circle" aria-hidden="true" /> Disconnected
-              </strong>
-            )}
-          </div>
-          <div className="bids">
-            {bids
-              .slice(0, 20)
-              .toArray()
-              .map(([price, amount]) => {
-                return (
-                  <div className="flex" key={price.toString()} style={{ height: '5%' }}>
-                    <div className="col-6 text-success">{price.toFixed(currentMarket.priceDecimals)}</div>
-                    <div className="col-6 orderbook-amount">{amount.toFixed(currentMarket.amountDecimals)}</div>
-                  </div>
-                );
-              })}
+          <div style={{ height: '100%' }}>
+            <div className="asks flex flex-column flex-column-reverse">
+              {asks
+                .slice(-20)
+                .reverse()
+                .toArray()
+                .map(([price, amount]) => {
+                  return (
+                    <div className="flex" key={price.toString()} style={{ height: '5%' }}>
+                      <div className="col-6 text-danger">{price.toFixed(currentMarket.priceDecimals)}</div>
+                      <div className="col-6 orderbook-amount">{amount.toFixed(currentMarket.amountDecimals)}</div>
+                    </div>
+                  );
+                })}
+            </div>
+            <div className="status">
+              {websocketConnected ? (
+                <strong className="col-6 text-success">
+                  <i className="fa fa-circle" aria-hidden="true" /> RealTime
+                </strong>
+              ) : (
+                <strong className="col-6 text-danger">
+                  <i className="fa fa-circle" aria-hidden="true" /> Disconnected
+                </strong>
+              )}
+            </div>
+            <div className="bids">
+              {bids
+                .slice(0, 20)
+                .toArray()
+                .map(([price, amount]) => {
+                  return (
+                    <div className="flex" key={price.toString()} style={{ height: '5%' }}>
+                      <div className="col-6 text-success">{price.toFixed(currentMarket.priceDecimals)}</div>
+                      <div className="col-6 orderbook-amount">{amount.toFixed(currentMarket.amountDecimals)}</div>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 }
