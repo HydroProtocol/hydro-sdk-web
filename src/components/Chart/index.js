@@ -12,7 +12,7 @@ import { last } from 'react-stockcharts/lib/utils';
 import { ema } from 'react-stockcharts/lib/indicator';
 import { MovingAverageTooltip, OHLCTooltip } from 'react-stockcharts/lib/tooltip';
 import { connect } from 'react-redux';
-import { testData, granularityOptions } from './constans';
+import { granularityOptions } from './constans';
 import Selector from '../Selector';
 import axios from 'axios';
 import './styles.scss';
@@ -59,200 +59,6 @@ class Trade extends Component {
   componentWillUnmount() {
     if (this.interval) {
       window.clearInterval(this.interval);
-    }
-  }
-
-  async loadRight() {
-    if (new Date().getTime() - this.state.lastUpdatedAt > 59000) {
-      this.loadData(this.state.granularityStr, this.state.to);
-    }
-  }
-
-  async loadLeft(start, end) {
-    this.loadData(this.state.granularityStr, null, this.state.from, start, end);
-  }
-
-  async loadData(granularityStr = null, from = null, to = null, start = null, end = null) {
-    const granularityIsSame = this.state.granularityStr === granularityStr;
-    if (this.state.loading || (granularityIsSame && this.state.noData)) {
-      return;
-    }
-    if (!granularityIsSame && this.state.noData) {
-      this.setState({ noData: false });
-    }
-    this.setState({ loading: true });
-
-    const params = this.generateParams(granularityStr || this.state.granularityStr, from, to);
-    if (granularityStr) {
-      this.setState({ granularityStr });
-    }
-
-    let res;
-    try {
-      res = await axios.get(
-        `https://api.ddex.io/v3/markets/${this.props.currentMarket.id}/tradingView?from=${params.from}&to=${
-          params.to
-        }&granularity=${params.granularityNum}`
-      );
-      if (res.data.data.meta && res.data.data.meta.noData) {
-        this.setState({ loading: false, noData: true });
-        return;
-      }
-    } catch (e) {
-      this.setState({ loading: false });
-      return;
-    }
-    const newData = this.fixData(res.data.data.candles);
-    const changeState = {
-      data: newData,
-      from: params.from,
-      to: params.to,
-      start: null,
-      end: null,
-      lastUpdatedAt: new Date().getTime()
-    };
-
-    if (granularityIsSame) {
-      if (this.state.from && this.state.from > params.from) {
-        // loadLeft
-        changeState.to = this.state.to;
-        changeState.data = [...newData, ...this.state.data];
-        changeState.start = start + newData.length;
-        changeState.end =
-          end + newData.length > start + newData.length + this.fitLengthToShow()
-            ? end + newData.length
-            : start + newData.length + this.fitLengthToShow();
-      }
-      if (this.state.to && this.state.to < params.to) {
-        // loadRight
-        changeState.from = this.state.from;
-        changeState.data = this.fixData([...this.state.data, ...newData]);
-      }
-    }
-
-    this.setState(changeState);
-    this.setState({ loading: false });
-  }
-
-  handleLoadMore(start, end) {
-    start = Math.ceil(start);
-    if (start === end) {
-      return;
-    }
-    this.loadLeft(start, end);
-  }
-
-  fixData(data) {
-    const fd = []; // fixedData
-    const granularityNum = this.generateParams(this.state.granularityStr).granularityNum;
-    for (let i = 0; i < data.length; i++) {
-      data[i].open = parseFloat(data[i].open);
-      data[i].high = parseFloat(data[i].high);
-      data[i].low = parseFloat(data[i].low);
-      data[i].close = parseFloat(data[i].close);
-      data[i].volume = parseFloat(data[i].volume);
-      let scale = Math.ceil((data[i].time || data[i].date) / 1000 / granularityNum);
-      let gap = i === 0 ? -1 : scale - fd[fd.length - 1].date;
-      if (i === 0 || gap === 1) {
-        fd.push({
-          date: scale,
-          open: data[i].open,
-          high: data[i].high,
-          low: data[i].low,
-          close: data[i].close,
-          volume: data[i].volume
-        });
-        continue;
-      }
-      let lastFd = fd[fd.length - 1];
-      if (gap === 0) {
-        let volume = lastFd.volume + data[i].volume;
-        if (
-          lastFd.open === data[i].open &&
-          lastFd.high === data[i].high &&
-          lastFd.low === data[i].low &&
-          lastFd.close === data[i].close &&
-          lastFd.volume === data[i].volume
-        ) {
-          volume = lastFd.volume;
-        }
-        fd[fd.length - 1] = {
-          date: scale,
-          open: lastFd.open,
-          high: Math.max(lastFd.high, data[i].high),
-          low: Math.min(lastFd.low, data[i].low),
-          close: data[i].close,
-          volume
-        };
-      } else if (gap > 1) {
-        for (let j = 1; j < gap; j++) {
-          fd.push({
-            date: lastFd.date + j,
-            open: lastFd.close,
-            high: lastFd.close,
-            low: lastFd.close,
-            close: lastFd.close,
-            volume: 0
-          });
-        }
-        fd.push({
-          date: scale,
-          open: data[i].open,
-          high: data[i].high,
-          low: data[i].low,
-          close: data[i].close,
-          volume: data[i].volume
-        });
-      }
-    }
-    for (let i = 0; i < fd.length; i++) {
-      fd[i].date = new Date(fd[i].date * 1000 * granularityNum);
-    }
-    return fd;
-  }
-
-  generateParams(granularityStr, from = null, to = null) {
-    let granularityNum;
-    to = to || Math.floor(new Date().getTime() / 1000);
-    switch (granularityStr) {
-      case '5m':
-        granularityNum = 60 * 5;
-        from = from || to - (60 * 60 * 24 * 365) / 12; // 356 * 24 points, from 1 month ago
-        break;
-      case '1h':
-        granularityNum = 60 * 60;
-        from = from || to - 60 * 60 * 24 * 365; // 356 * 24 points, from 1 year ago
-        break;
-      case '1d':
-        granularityNum = 60 * 60 * 24;
-        from = from || to - 60 * 60 * 24 * 365; // 356 points, from 1 year ago
-        break;
-      default:
-        // same as 1h
-        granularityNum = 60 * 60;
-        from = from || to - 60 * 60 * 24 * 365;
-        break;
-    }
-
-    return {
-      from,
-      to,
-      granularityNum
-    };
-  }
-
-  fitLengthToShow() {
-    const { width } = this.props;
-    return Math.ceil((width - 50) / CANDLE_WIDTH_AND_GAP);
-  }
-
-  selectEMA(value) {
-    if (value === 'ema12') {
-      this.setState({ isShowEMA12: !this.state.isShowEMA12 });
-      window.localStorage.setItem('isShowEMA12', !this.state.isShowEMA12);
-    } else if (value === 'ema26') {
-      this.setState({ isShowEMA26: !this.state.isShowEMA26 });
-      window.localStorage.setItem('isShowEMA26', !this.state.isShowEMA26);
     }
   }
 
@@ -470,6 +276,189 @@ class Trade extends Component {
         </div>
       </>
     );
+  }
+  async loadRight() {
+    if (new Date().getTime() - this.state.lastUpdatedAt > 59000) {
+      this.loadData(this.state.granularityStr, this.state.to);
+    }
+  }
+
+  async loadLeft(start, end) {
+    this.loadData(this.state.granularityStr, null, this.state.from, start, end);
+  }
+
+  async loadData(granularityStr = null, from = null, to = null, start = null, end = null) {
+    const granularityIsSame = this.state.granularityStr === granularityStr;
+    if (this.state.loading || (granularityIsSame && this.state.noData)) {
+      return;
+    }
+    if (!granularityIsSame && this.state.noData) {
+      this.setState({ noData: false });
+    }
+    this.setState({ loading: true });
+
+    const params = this.generateParams(granularityStr || this.state.granularityStr, from, to);
+    if (granularityStr) {
+      this.setState({ granularityStr });
+    }
+
+    let res;
+    try {
+      res = await axios.get(
+        `https://api.ddex.io/v3/markets/${this.props.currentMarket.id}/tradingView?from=${params.from}&to=${
+          params.to
+        }&granularity=${params.granularityNum}`
+      );
+      if (res.data.data.meta && res.data.data.meta.noData) {
+        this.setState({ loading: false, noData: true });
+        return;
+      }
+    } catch (e) {
+      this.setState({ loading: false });
+      return;
+    }
+    const newData = this.fixData(res.data.data.candles);
+    const changeState = {
+      data: newData,
+      from: params.from,
+      to: params.to,
+      start: null,
+      end: null,
+      lastUpdatedAt: new Date().getTime()
+    };
+
+    if (granularityIsSame) {
+      if (this.state.from && this.state.from > params.from) {
+        // loadLeft
+        changeState.to = this.state.to;
+        changeState.data = [...newData, ...this.state.data];
+        changeState.start = start + newData.length;
+        changeState.end =
+          end + newData.length > start + newData.length + this.fitLengthToShow()
+            ? end + newData.length
+            : start + newData.length + this.fitLengthToShow();
+      }
+      if (this.state.to && this.state.to < params.to) {
+        // loadRight
+        changeState.from = this.state.from;
+        changeState.data = this.fixData([...this.state.data, ...newData]);
+      }
+    }
+
+    this.setState(changeState);
+    this.setState({ loading: false });
+  }
+
+  handleLoadMore(start, end) {
+    start = Math.ceil(start);
+    if (start === end) {
+      return;
+    }
+    this.loadLeft(start, end);
+  }
+
+  fixData(data) {
+    const fd = []; // fixedData
+    const granularityNum = this.generateParams(this.state.granularityStr).granularityNum;
+    for (let i = 0; i < data.length; i++) {
+      data[i].open = parseFloat(data[i].open);
+      data[i].high = parseFloat(data[i].high);
+      data[i].low = parseFloat(data[i].low);
+      data[i].close = parseFloat(data[i].close);
+      data[i].volume = parseFloat(data[i].volume);
+      let scale = Math.ceil((data[i].time || data[i].date) / 1000 / granularityNum);
+      let gap = i === 0 ? -1 : scale - fd[fd.length - 1].date;
+      if (i === 0 || gap === 1) {
+        fd.push({
+          date: scale,
+          open: data[i].open,
+          high: data[i].high,
+          low: data[i].low,
+          close: data[i].close,
+          volume: data[i].volume
+        });
+        continue;
+      }
+      let lastFd = fd[fd.length - 1];
+      if (gap === 0) {
+        let volume = lastFd.volume + data[i].volume;
+        if (
+          lastFd.open === data[i].open &&
+          lastFd.high === data[i].high &&
+          lastFd.low === data[i].low &&
+          lastFd.close === data[i].close &&
+          lastFd.volume === data[i].volume
+        ) {
+          volume = lastFd.volume;
+        }
+        fd[fd.length - 1] = {
+          date: scale,
+          open: lastFd.open,
+          high: Math.max(lastFd.high, data[i].high),
+          low: Math.min(lastFd.low, data[i].low),
+          close: data[i].close,
+          volume
+        };
+      } else if (gap > 1) {
+        for (let j = 1; j < gap; j++) {
+          fd.push({
+            date: lastFd.date + j,
+            open: lastFd.close,
+            high: lastFd.close,
+            low: lastFd.close,
+            close: lastFd.close,
+            volume: 0
+          });
+        }
+        fd.push({
+          date: scale,
+          open: data[i].open,
+          high: data[i].high,
+          low: data[i].low,
+          close: data[i].close,
+          volume: data[i].volume
+        });
+      }
+    }
+    for (let i = 0; i < fd.length; i++) {
+      fd[i].date = new Date(fd[i].date * 1000 * granularityNum);
+    }
+    return fd;
+  }
+
+  generateParams(granularityStr, from = null, to = null) {
+    let granularityNum;
+    to = to || Math.floor(new Date().getTime() / 1000);
+    switch (granularityStr) {
+      case '5m':
+        granularityNum = 60 * 5;
+        from = from || to - (60 * 60 * 24 * 365) / 12; // 356 * 24 points, from 1 month ago
+        break;
+      case '1h':
+        granularityNum = 60 * 60;
+        from = from || to - 60 * 60 * 24 * 365; // 356 * 24 points, from 1 year ago
+        break;
+      case '1d':
+        granularityNum = 60 * 60 * 24;
+        from = from || to - 60 * 60 * 24 * 365; // 356 points, from 1 year ago
+        break;
+      default:
+        // same as 1h
+        granularityNum = 60 * 60;
+        from = from || to - 60 * 60 * 24 * 365;
+        break;
+    }
+
+    return {
+      from,
+      to,
+      granularityNum
+    };
+  }
+
+  fitLengthToShow() {
+    const { width } = this.props;
+    return Math.ceil((width - 50) / CANDLE_WIDTH_AND_GAP);
   }
 }
 
