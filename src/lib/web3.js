@@ -1,4 +1,3 @@
-import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
 import { loadAccount, loadAccountBalance, watchToken } from '../actions/account';
 import abi from './abi';
@@ -170,8 +169,8 @@ const watchTransactionStatus = (txID, callback) => {
 };
 
 const loadMetamask = () => {
-  if (typeof window.ethereum !== 'undefined') {
-    web3 = new Web3(window.ethereum);
+  if (typeof window.web3 !== 'undefined') {
+    web3 = window.web3;
     Contract = web3.eth.contract(abi);
   }
 };
