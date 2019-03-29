@@ -232,6 +232,8 @@ const loadWalletAccountBalance = () => {
       const accountBalance = await callPromise(web3.eth.getBalance, address);
       balance = new BigNumber(accountBalance.toString());
       await dispatch(loadAccountBalance(balance));
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   };
 };
