@@ -8,8 +8,8 @@ import OrderBook from './components/Orderbook';
 import Trade from './components/Trade';
 // import Balance from './components/Balance';
 import Orders from './components/Orders';
-// import Trades from './components/Trades';
 import Chart from './components/Chart';
+import TradeHistory from './components/TradeHistory';
 
 const mapStateToProps = state => {
   return {
@@ -52,13 +52,16 @@ class App extends React.PureComponent {
               <OrderBook />
             </div>
           </div>
-          <div className="flex-column flex-1">
+          <div className="flex-column flex-1 border-right">
             <div className="grid flex-1">
               <Chart />
             </div>
             <div className="grid flex-1 border-top">
               <Orders />
             </div>
+          </div>
+          <div className="grid">
+            <TradeHistory />
           </div>
         </div>
       </div>

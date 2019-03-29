@@ -24,7 +24,7 @@ class Header extends React.PureComponent {
         <img className="navbar-brand" src={require('../../images/hydro.svg')} alt="hydro" />
         <div className="dropdown navbar-nav mr-auto">
           <button
-            className="btn btn-secondary dropdown-toggle"
+            className="btn btn-primary dropdown-toggle"
             type="button"
             id="dropdownMenuButton"
             data-toggle="dropdown"

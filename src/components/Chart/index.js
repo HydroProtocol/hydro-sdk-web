@@ -166,7 +166,7 @@ class Trade extends Component {
             }}
           />
         </div>
-        <div style={{ height: '100%', position: 'relative' }} className="flex-column">
+        <div style={{ position: 'relative' }} className="flex-1 flex-column">
           {this.state.loading && <i className="fa fa-spinner fa-spin chartLoading" />}
           {!(this.state.loading || this.state.data.length === 0) && (
             <ChartCanvas
