@@ -81,62 +81,68 @@ class Trade extends React.PureComponent {
     }
 
     return (
-      <div className="trade flex-1 flex-column">
-        <ul className="nav nav-tabs">
-          <li className="nav-item flex-1 flex">
-            <div
-              className={`flex-1 trade-tab text-secondary text-center${side === 'buy' ? ' active' : ''}`}
-              onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'buy'))}>
-              Buy
-            </div>
-          </li>
-          <li className="nav-item flex-1 flex">
-            <div
-              className={`flex-1 trade-tab text-secondary text-center${side === 'sell' ? ' active' : ''}`}
-              onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'sell'))}>
-              Sell
-            </div>
-          </li>
-        </ul>
-        <div className="flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
-          <form className="text-secondary flex-1" onSubmit={handleSubmit(() => this.submit())}>
-            <div className="form-group">
-              <label>Price</label>
-              <div className="input-group">
-                <Field name="price" className="form-control" component={'input'} />
-                <div className="input-group-append">
-                  <span className="input-group-text">{currentMarket.quoteToken}</span>
-                </div>
-              </div>
-            </div>
-            <div className="form-group">
-              <label>Amount</label>
-              <div className="input-group">
-                <Field name="amount" className="form-control" component={'input'} />
-                <div className="input-group-append">
-                  <span className="input-group-text">{currentMarket.baseToken}</span>
-                </div>
-              </div>
-            </div>
-            <div className="form-group">
-              <div className="flex" style={{ marginBottom: 6 }}>
-                <div className="flex-grow-1">Total</div>
-                <div className="text-secondary">
-                  Fee ≈ {gasFee.plus(tradeFee).toFixed(currentMarket.priceDecimals)} {currentMarket.quoteToken}
-                </div>
-              </div>
-              <input
-                className="form-control"
-                value={`${total.toFixed(currentMarket.priceDecimals)} ${currentMarket.quoteToken}`}
-                disabled
-              />
-            </div>
-            <button type="submit" className={`form-control btn ${side === 'buy' ? 'btn-success' : 'btn-danger'}`}>
-              {side} {currentMarket.baseToken}
-            </button>
-          </form>
+      <>
+        <div className="title">
+          <div>{currentMarket.id}</div>
+          <div className="text-secondary">Make a Limit Order</div>
         </div>
-      </div>
+        <div className="trade flex-1 flex-column">
+          <ul className="nav nav-tabs">
+            <li className="nav-item flex-1 flex">
+              <div
+                className={`flex-1 trade-tab text-secondary text-center${side === 'buy' ? ' active' : ''}`}
+                onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'buy'))}>
+                Buy
+              </div>
+            </li>
+            <li className="nav-item flex-1 flex">
+              <div
+                className={`flex-1 trade-tab text-secondary text-center${side === 'sell' ? ' active' : ''}`}
+                onClick={() => dispatch(change(TRADE_FORM_ID, 'side', 'sell'))}>
+                Sell
+              </div>
+            </li>
+          </ul>
+          <div className="flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
+            <form className="text-secondary flex-1" onSubmit={handleSubmit(() => this.submit())}>
+              <div className="form-group">
+                <label>Price</label>
+                <div className="input-group">
+                  <Field name="price" className="form-control" component={'input'} />
+                  <div className="input-group-append">
+                    <span className="input-group-text">{currentMarket.quoteToken}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Amount</label>
+                <div className="input-group">
+                  <Field name="amount" className="form-control" component={'input'} />
+                  <div className="input-group-append">
+                    <span className="input-group-text">{currentMarket.baseToken}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="form-group">
+                <div className="flex" style={{ marginBottom: 6 }}>
+                  <div className="flex-grow-1">Total</div>
+                  <div className="text-secondary">
+                    Fee ≈ {gasFee.plus(tradeFee).toFixed(currentMarket.priceDecimals)} {currentMarket.quoteToken}
+                  </div>
+                </div>
+                <input
+                  className="form-control"
+                  value={`${total.toFixed(currentMarket.priceDecimals)} ${currentMarket.quoteToken}`}
+                  disabled
+                />
+              </div>
+              <button type="submit" className={`form-control btn ${side === 'buy' ? 'btn-success' : 'btn-danger'}`}>
+                {side} {currentMarket.baseToken}
+              </button>
+            </form>
+          </div>
+        </div>
+      </>
     );
   }
 
