@@ -47,7 +47,7 @@ class App extends React.PureComponent {
             <div className="grid border-right">
               <Trade />
             </div>
-            <div className="grid border-right">
+            <div className="grid border-right flex-column">
               <OrderBook />
             </div>
           </div>
