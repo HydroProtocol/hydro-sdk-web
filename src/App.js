@@ -42,7 +42,7 @@ class App extends React.PureComponent {
       <div className="app">
         <WebsocketConnector />
         <Header />
-        <div className="flex flex-1">
+        <div className="flex flex-1 overflow-hidden">
           <div className="flex">
             <div className="grid border-right">
               <Trade />
