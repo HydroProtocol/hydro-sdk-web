@@ -7,8 +7,10 @@ import { trade } from '../../actions/trade';
 import BigNumber from 'bignumber.js';
 import { loadHotDiscountRules, getHotTokenAmount } from '../../actions/fee';
 import { calculateTrade } from '../../lib/tradeCalculator';
+import { loginRequest } from '../../actions/account';
 import PerfectScrollbar from 'perfect-scrollbar';
 import './styles.scss';
+import { sleep } from '../../lib/utils';
 
 const mapStateToProps = state => {
   const selector = formValueSelector(TRADE_FORM_ID);
@@ -35,6 +37,7 @@ const mapStateToProps = state => {
     },
     currentMarket: state.market.getIn(['markets', 'currentMarket']),
     hotTokenAmount: state.config.get('hotTokenAmount'),
+    address: state.account.get('address'),
     isLoggedIn: state.account.get('isLoggedIn'),
     price: new BigNumber(selector(state, 'price') || 0),
     amount: new BigNumber(selector(state, 'amount') || 0),
@@ -75,7 +78,7 @@ class Trade extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, side, handleSubmit, currentMarket, total, gasFee, tradeFee } = this.props;
+    const { dispatch, side, handleSubmit, currentMarket, total, gasFee, tradeFee, subtotal } = this.props;
     if (!currentMarket) {
       return null;
     }
@@ -103,38 +106,42 @@ class Trade extends React.PureComponent {
               </div>
             </li>
           </ul>
-          <div className="flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
-            <form className="text-secondary flex-1" onSubmit={handleSubmit(() => this.submit())}>
-              <div className="form-group">
-                <label>Price</label>
-                <div className="input-group">
-                  <Field name="price" className="form-control" component={'input'} />
-                  <div className="input-group-append">
-                    <span className="input-group-text">{currentMarket.quoteToken}</span>
+          <div className="flex flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
+            <form
+              className="flex-column text-secondary flex-1 justify-content-between"
+              onSubmit={handleSubmit(() => this.submit())}>
+              <div>
+                <div className="form-group">
+                  <label>Price</label>
+                  <div className="input-group">
+                    <Field name="price" className="form-control" component={'input'} />
+                    <span className="text-secondary unit">{currentMarket.quoteToken}</span>
                   </div>
                 </div>
-              </div>
-              <div className="form-group">
-                <label>Amount</label>
-                <div className="input-group">
-                  <Field name="amount" className="form-control" component={'input'} />
-                  <div className="input-group-append">
-                    <span className="input-group-text">{currentMarket.baseToken}</span>
+                <div className="form-group">
+                  <label>Amount</label>
+                  <div className="input-group">
+                    <Field name="amount" className="form-control" component={'input'} />
+                    <span className="text-secondary unit">{currentMarket.baseToken}</span>
                   </div>
                 </div>
-              </div>
-              <div className="form-group">
-                <div className="flex" style={{ marginBottom: 6 }}>
-                  <div className="flex-grow-1">Total</div>
-                  <div className="text-secondary">
-                    Fee ≈ {gasFee.plus(tradeFee).toFixed(currentMarket.priceDecimals)} {currentMarket.quoteToken}
+                <div className="form-group">
+                  <div className="form-title">Order Summary</div>
+                  <div className="list">
+                    <div className="item flex justify-content-between">
+                      <div className="name">Order</div>
+                      <div className="name">{subtotal.toFixed(currentMarket.priceDecimals)}</div>
+                    </div>
+                    <div className="item flex justify-content-between">
+                      <div className="name">Fees</div>
+                      <div className="name">{gasFee.plus(tradeFee).toFixed(currentMarket.priceDecimals)}</div>
+                    </div>
+                    <div className="item flex justify-content-between">
+                      <div className="name">Total</div>
+                      <div className="name">{total.toFixed(currentMarket.priceDecimals)}</div>
+                    </div>
                   </div>
                 </div>
-                <input
-                  className="form-control"
-                  value={`${total.toFixed(currentMarket.priceDecimals)} ${currentMarket.quoteToken}`}
-                  disabled
-                />
               </div>
               <button type="submit" className={`form-control btn ${side === 'buy' ? 'btn-success' : 'btn-danger'}`}>
                 {side} {currentMarket.baseToken}
@@ -147,7 +154,12 @@ class Trade extends React.PureComponent {
   }
 
   async submit() {
-    const { amount, price, side, orderType, dispatch } = this.props;
+    const { amount, price, side, orderType, dispatch, isLoggedIn, address } = this.props;
+    if (!isLoggedIn) {
+      await dispatch(loginRequest(address));
+      // Metamask's window will be hidden when continuous call Metamask sign method
+      await sleep(500);
+    }
     try {
       await dispatch(trade(side, price, amount, orderType));
     } catch (e) {

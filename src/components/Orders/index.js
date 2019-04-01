@@ -9,7 +9,7 @@ class Orders extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      selectedType: 'openOrders'
+      selectedType: OPTIONS[0].value
     };
   }
   render() {

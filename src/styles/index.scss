@@ -11,6 +11,7 @@ body {
     height: 100%;
     min-width: 1440px;
     background-color: $white;
+    color: $black;
 }
 
 #root {
@@ -104,6 +105,10 @@ table {
 .nav-tabs {
     border-bottom: 0;
 }
+form {
+    margin: 12px 0;
+    padding: 0 24px;
+}
 .app {
     display: flex;
     flex-direction: column;
@@ -112,6 +117,7 @@ table {
     .title {
         font-size: 14px;
         padding: 12px;
+        height: 67px;
         border-bottom: 1px solid $borderGrey;
     }
     .grid {

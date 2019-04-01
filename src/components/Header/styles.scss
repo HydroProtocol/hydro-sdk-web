@@ -1,0 +1,9 @@
+@import '../../styles/variables.scss';
+
+.header-dropdown {
+    background-color: #535ec3;
+    border-color: #4954ac;
+}
+.dropdown-toggle::after {
+    margin-left: 12px;
+}

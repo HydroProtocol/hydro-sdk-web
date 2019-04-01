@@ -2,6 +2,7 @@ import React from 'react';
 import { loginRequest, enableMetamask } from '../../actions/account';
 import { updateCurrentMarket } from '../../actions/markets';
 import { connect } from 'react-redux';
+import './styles.scss';
 
 const mapStateToProps = state => {
   return {
@@ -24,7 +25,7 @@ class Header extends React.PureComponent {
         <img className="navbar-brand" src={require('../../images/hydro.svg')} alt="hydro" />
         <div className="dropdown navbar-nav mr-auto">
           <button
-            className="btn btn-primary dropdown-toggle"
+            className="btn btn-primary header-dropdown dropdown-toggle"
             type="button"
             id="dropdownMenuButton"
             data-toggle="dropdown"
