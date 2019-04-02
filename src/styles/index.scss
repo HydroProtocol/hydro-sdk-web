@@ -44,6 +44,18 @@ body {
         background-color: $red;
     }
 }
+.btn-primary {
+    background-color: #535ec3;
+    border-color: #4954ac;
+    color: $white !important;
+    &:hover,
+    &:focus,
+    &:active {
+        background-color: #535ec3 !important;
+        border-color: #4954ac !important;
+        color: $white !important;
+    }
+}
 .btn-success,
 .btn-danger {
     border: none;
@@ -55,7 +67,7 @@ body {
     &:hover,
     &:focus,
     &:active {
-        color: #fff;
+        color: $white;
         background-color: #00ac7e !important;
     }
 }
@@ -64,7 +76,7 @@ body {
     &:hover,
     &:focus,
     &:active {
-        color: #fff;
+        color: $white;
         background-color: #d9656a !important;
     }
 }
