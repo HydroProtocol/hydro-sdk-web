@@ -24,6 +24,7 @@ module.exports = {
         'no-unused-vars': 'warn',
         'react/prop-types': 'off',
         'no-case-declarations': 'off',
-        'no-extra-boolean-cast': 'off'
+        'no-extra-boolean-cast': 'off',
+        'react/no-unescaped-entities': 'off'
     }
 };
