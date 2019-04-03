@@ -6,6 +6,10 @@ import api from '../lib/api';
 // 从Metamask读取到address，处理登录状态
 export const loadAccount = address => {
   return (dispatch, getState) => {
+    const currentAddress = getState().account.get('address');
+    if (currentAddress && currentAddress !== address) {
+      window.location.reload();
+    }
     dispatch({
       type: 'LOAD_ACCOUNT',
       payload: { address }

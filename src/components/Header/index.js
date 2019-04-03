@@ -9,7 +9,8 @@ const mapStateToProps = state => {
     address: state.account.get('address'),
     isLoggedIn: state.account.get('isLoggedIn'),
     currentMarket: state.market.getIn(['markets', 'currentMarket']),
-    markets: state.market.getIn(['markets', 'data'])
+    markets: state.market.getIn(['markets', 'data']),
+    web3NetworkID: state.config.get('web3NetworkID')
   };
 };
 
@@ -19,7 +20,7 @@ class Header extends React.PureComponent {
   }
 
   render() {
-    const { currentMarket, markets, dispatch } = this.props;
+    const { currentMarket, markets, dispatch, web3NetworkID } = this.props;
     return (
       <div className="navbar bg-blue navbar-expand-lg">
         <img className="navbar-brand" src={require('../../images/hydro.svg')} alt="hydro" />
@@ -49,6 +50,11 @@ class Header extends React.PureComponent {
             })}
           </div>
         </div>
+        {web3NetworkID !== 66 && (
+          <span className="btn text-danger" style={{ marginRight: 12 }}>
+            Network Error: Switch Metamask's network to localhost:8545.
+          </span>
+        )}
         <a
           href="https://hydroprotocol.io/docs/overview/what-is-hydro.html"
           className="btn btn-primary"

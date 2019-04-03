@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { loadAccount, loadAccountBalance, watchToken } from '../actions/account';
+import { loadWeb3NetworkID } from '../actions/config';
 import abi from './abi';
 import env from './env';
 import { callPromise } from './utils';
@@ -150,6 +151,7 @@ export const initWatchers = () => {
   return async dispatch => {
     loadMetamask();
     dispatch(startAccountWatchers());
+    startNetworkWatcher(dispatch);
   };
 };
 
@@ -203,6 +205,23 @@ const startAccountWatchers = () => {
 
     return Promise.all([watchAccount(), watchBalance()]);
   };
+};
+
+const startNetworkWatcher = dispatch => {
+  const watcher = () => {
+    const networkId = web3.version.network;
+    if (!!networkId) {
+      dispatch(loadWeb3NetworkID(networkId));
+    } else {
+      web3.version.getNetwork((err, web3NetworkID) => {
+        dispatch(loadWeb3NetworkID(web3NetworkID));
+      });
+    }
+
+    setTimeout(watcher, 3000);
+  };
+
+  watcher();
 };
 
 const loadWalletAccount = () => {
