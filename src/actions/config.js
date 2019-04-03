@@ -10,7 +10,7 @@ export const loadWeb3NetworkID = web3NetworkID => {
   return async (dispatch, getState) => {
     const state = getState();
     const oldWeb3NetworkID = state.config.get('web3NetworkID');
-    console.log(oldWeb3NetworkID, web3NetworkID);
+
     if (oldWeb3NetworkID === web3NetworkID) {
       return;
     } else if (oldWeb3NetworkID) {
