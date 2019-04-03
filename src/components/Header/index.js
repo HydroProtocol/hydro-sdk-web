@@ -56,7 +56,7 @@ class Header extends React.PureComponent {
           </span>
         )}
         <a
-          href="https://hydroprotocol.io/docs/overview/what-is-hydro.html"
+          href="https://hydroprotocol.io/developers/docs/overview/what-is-hydro.html"
           className="btn btn-primary"
           target="_blank"
           rel="noopener noreferrer"
