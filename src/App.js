@@ -6,9 +6,8 @@ import Header from './components/Header';
 import WebsocketConnector from './components/WebsocketConnector';
 import OrderBook from './components/Orderbook';
 import Trade from './components/Trade';
-// import Balance from './components/Balance';
+import Wallet from './components/Wallet';
 import Orders from './components/Orders';
-import Chart from './components/Chart';
 import TradeHistory from './components/TradeHistory';
 
 const mapStateToProps = state => {
@@ -43,18 +42,18 @@ class App extends React.PureComponent {
       <div className="app">
         <WebsocketConnector />
         <Header />
-        <div className="flex flex-1">
+        <div className="flex flex-1 overflow-hidden">
           <div className="flex">
             <div className="grid border-right">
               <Trade />
             </div>
-            <div className="grid border-right">
+            <div className="grid border-right flex-column">
               <OrderBook />
             </div>
           </div>
           <div className="flex-column flex-1 border-right">
             <div className="grid flex-1">
-              <Chart />
+              <Wallet />
             </div>
             <div className="grid flex-1 border-top">
               <Orders />

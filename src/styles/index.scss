@@ -11,6 +11,7 @@ body {
     height: 100%;
     min-width: 1440px;
     background-color: $white;
+    color: $black;
 }
 
 #root {
@@ -43,6 +44,18 @@ body {
         background-color: $red;
     }
 }
+.btn-primary {
+    background-color: #535ec3;
+    border-color: #4954ac;
+    color: $white !important;
+    &:hover,
+    &:focus,
+    &:active {
+        background-color: #535ec3 !important;
+        border-color: #4954ac !important;
+        color: $white !important;
+    }
+}
 .btn-success,
 .btn-danger {
     border: none;
@@ -54,7 +67,7 @@ body {
     &:hover,
     &:focus,
     &:active {
-        color: #fff;
+        color: $white;
         background-color: #00ac7e !important;
     }
 }
@@ -63,7 +76,7 @@ body {
     &:hover,
     &:focus,
     &:active {
-        color: #fff;
+        color: $white;
         background-color: #d9656a !important;
     }
 }
@@ -104,6 +117,10 @@ table {
 .nav-tabs {
     border-bottom: 0;
 }
+form {
+    margin: 12px 0;
+    padding: 0 24px;
+}
 .app {
     display: flex;
     flex-direction: column;
@@ -112,6 +129,7 @@ table {
     .title {
         font-size: 14px;
         padding: 12px;
+        height: 67px;
         border-bottom: 1px solid $borderGrey;
     }
     .grid {

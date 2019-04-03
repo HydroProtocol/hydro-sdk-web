@@ -34,7 +34,7 @@ class Trades extends React.PureComponent {
     const { trades, address } = this.props;
     return (
       <div className="trades flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
-        <table className="table table-light">
+        <table className="table">
           <thead>
             <tr className="text-secondary">
               <th>Pair</th>

@@ -1,13 +1,11 @@
 .orderbook {
-    height: calc(100% - 38px);
     .header,
     .status {
         height: 36px;
         line-height: 36px;
     }
-    .asks,
-    .bids {
-        height: calc(50% - 26px);
-        overflow: hidden;
+    .ask,
+    .bid {
+        min-height: 24px;
     }
 }

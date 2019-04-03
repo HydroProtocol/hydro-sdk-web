@@ -2,6 +2,7 @@ import React from 'react';
 import { loginRequest, enableMetamask } from '../../actions/account';
 import { updateCurrentMarket } from '../../actions/markets';
 import { connect } from 'react-redux';
+import './styles.scss';
 
 const mapStateToProps = state => {
   return {
@@ -24,7 +25,7 @@ class Header extends React.PureComponent {
         <img className="navbar-brand" src={require('../../images/hydro.svg')} alt="hydro" />
         <div className="dropdown navbar-nav mr-auto">
           <button
-            className="btn btn-primary dropdown-toggle"
+            className="btn btn-primary header-dropdown dropdown-toggle"
             type="button"
             id="dropdownMenuButton"
             data-toggle="dropdown"
@@ -48,6 +49,14 @@ class Header extends React.PureComponent {
             })}
           </div>
         </div>
+        <a
+          href="https://hydroprotocol.io/docs/overview/what-is-hydro.html"
+          className="btn btn-primary"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ marginRight: 12 }}>
+          DOCUMENTATION
+        </a>
         {this.renderAccount()}
       </div>
     );
@@ -56,10 +65,10 @@ class Header extends React.PureComponent {
   renderAccount() {
     const { address, dispatch, isLoggedIn } = this.props;
     if (isLoggedIn && address) {
-      return <div className="btn btn-outline-light">{address}</div>;
+      return <div className="btn btn-primary">{address}</div>;
     } else if (address) {
       return (
-        <button className="btn btn-outline-light" onClick={() => dispatch(loginRequest(address))}>
+        <button className="btn btn-primary" onClick={() => dispatch(loginRequest(address))}>
           Click to connect Metamask
         </button>
       );

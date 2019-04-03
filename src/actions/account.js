@@ -3,20 +3,6 @@ import { saveLoginData, loadAccountHydroAuthentication } from '../lib/session';
 import BigNumber from 'bignumber.js';
 import api from '../lib/api';
 
-export const WRAP_TYPE = {
-  WRAP: 'WRAP',
-  UNWRAP: 'UNWRAP'
-};
-
-export const setWrapType = type => {
-  return dispatch => {
-    dispatch({
-      type: 'SET_WRAP_TYPE',
-      payload: { type }
-    });
-  };
-};
-
 // 从Metamask读取到address，处理登录状态
 export const loadAccount = address => {
   return (dispatch, getState) => {

@@ -10,15 +10,11 @@ export const initState = Map({
   approving: Map(),
   orders: OrderedMap(),
   trades: OrderedMap(),
-  transactions: OrderedMap(),
-  wrapType: ''
+  transactions: OrderedMap()
 });
 
 export default (state = initState, action) => {
   switch (action.type) {
-    case 'SET_WRAP_TYPE':
-      state = state.set('wrapType', action.payload.type);
-      return state;
     case 'LOAD_ACCOUNT':
       state = state.set('address', action.payload.address);
       return state;

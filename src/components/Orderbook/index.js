@@ -46,46 +46,46 @@ class OrderBook extends React.Component {
           <div>Orderbook</div>
           <div className="text-secondary">Available Bid and Ask orders</div>
         </div>
-        <div className="orderbook text-white">
+        <div className="orderbook flex-column flex-1">
           <div className="flex header text-secondary">
-            <div className="col-6">Price</div>
             <div className="col-6">Amount</div>
+            <div className="col-6 text-right">Price</div>
           </div>
-          <div style={{ height: '100%' }}>
-            <div className="asks flex flex-column flex-column-reverse">
+          <div className="flex-column flex-1">
+            <div className="asks flex-column flex-column-reverse flex-1 overflow-hidden">
               {asks
                 .slice(-20)
                 .reverse()
                 .toArray()
                 .map(([price, amount]) => {
                   return (
-                    <div className="flex" key={price.toString()} style={{ height: '5%' }}>
-                      <div className="col-6 text-danger">{price.toFixed(currentMarket.priceDecimals)}</div>
+                    <div className="ask flex align-items-center" key={price.toString()}>
                       <div className="col-6 orderbook-amount">{amount.toFixed(currentMarket.amountDecimals)}</div>
+                      <div className="col-6 text-danger text-right">{price.toFixed(currentMarket.priceDecimals)}</div>
                     </div>
                   );
                 })}
             </div>
-            <div className="status">
+            <div className="status border-top border-bottom">
               {websocketConnected ? (
-                <strong className="col-6 text-success">
+                <div className="col-6 text-success">
                   <i className="fa fa-circle" aria-hidden="true" /> RealTime
-                </strong>
+                </div>
               ) : (
-                <strong className="col-6 text-danger">
+                <div className="col-6 text-danger">
                   <i className="fa fa-circle" aria-hidden="true" /> Disconnected
-                </strong>
+                </div>
               )}
             </div>
-            <div className="bids">
+            <div className="bids flex-column flex-1 overflow-hidden">
               {bids
                 .slice(0, 20)
                 .toArray()
                 .map(([price, amount]) => {
                   return (
-                    <div className="flex" key={price.toString()} style={{ height: '5%' }}>
-                      <div className="col-6 text-success">{price.toFixed(currentMarket.priceDecimals)}</div>
+                    <div className="bid flex align-items-center" key={price.toString()}>
                       <div className="col-6 orderbook-amount">{amount.toFixed(currentMarket.amountDecimals)}</div>
+                      <div className="col-6 text-success text-right">{price.toFixed(currentMarket.priceDecimals)}</div>
                     </div>
                   );
                 })}
