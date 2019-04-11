@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { loadMarkets, loadTradeHistory } from './actions/markets';
+import { loadMarkets, loadTradeHistory, loadAugurs } from './actions/markets';
 import { initWatchers } from './lib/web3';
 import Header from './components/Header';
 import WebsocketConnector from './components/WebsocketConnector';
@@ -19,7 +19,7 @@ const mapStateToProps = state => {
 class App extends React.PureComponent {
   componentDidMount() {
     const { dispatch, currentMarket } = this.props;
-    dispatch(loadMarkets());
+    dispatch(loadAugurs());
     dispatch(initWatchers());
     if (currentMarket) {
       dispatch(loadTradeHistory(currentMarket.id));
@@ -28,7 +28,7 @@ class App extends React.PureComponent {
 
   componentDidUpdate(prevProps) {
     const { currentMarket, dispatch } = this.props;
-    if (currentMarket !== prevProps.currentMarket) {
+    if (currentMarket && currentMarket !== prevProps.currentMarket) {
       dispatch(loadTradeHistory(currentMarket.id));
     }
   }

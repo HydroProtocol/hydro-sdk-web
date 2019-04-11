@@ -5,6 +5,16 @@ const initialOrderbook = Map({
   asks: List()
 });
 
+const initialMarkets = Map({
+  loaded: false,
+  loading: true,
+  data: List(),
+  currentMarket: null,
+  onlyMarket: null,
+  baseToken: 'ALL',
+  searchTerm: ''
+});
+
 const initialState = Map({
   marketStatus: Map({
     loaded: false,
@@ -12,15 +22,14 @@ const initialState = Map({
     data: List()
   }),
 
-  markets: Map({
+  augurs: Map({
     loaded: false,
     loading: true,
     data: List(),
-    currentMarket: null,
-    onlyMarket: null,
-    baseToken: 'ALL',
-    searchTerm: ''
+    currentAugur: null
   }),
+
+  markets: initialMarkets,
 
   orderbook: initialOrderbook,
   tickers: Map({
@@ -50,10 +59,11 @@ const reverseBigNumberComparator = (a, b) => {
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'LOAD_MARKETS':
+      state = state.set('markets', initialMarkets);
       state = state.setIn(['markets', 'data'], List(action.payload.markets));
-      if (!state.getIn(['markets', 'currentMarket'])) {
-        state = state.setIn(['markets', 'currentMarket'], action.payload.markets[0]);
-      }
+      return state;
+    case 'LOAD_AUGURS':
+      state = state.setIn(['augurs', 'data'], List(action.payload.augurs));
       return state;
     case 'UPDATE_CURRENT_MARKET': {
       const currentMarket = action.payload.currentMarket;
@@ -62,6 +72,16 @@ export default (state = initialState, action) => {
       state = state.setIn(['markets', 'currentMarketFees'], { asTakerFeeRate, asMakerFeeRate, gasFeeAmount });
       state = state.set('orderbook', initialOrderbook);
       state = state.set('tradeHistory', OrderedMap());
+      return state;
+    }
+    case 'UPDATE_CURRENT_AUGUR': {
+      const currentAugur = action.payload.currentAugur;
+      // const { asTakerFeeRate, asMakerFeeRate, gasFeeAmount } = currentAugur;
+      state = state.setIn(['augurs', 'currentAugur'], currentAugur);
+      // state = state.set('markets', initialMarkets);
+      // state = state.setIn(['augurs', 'currentAugurFees'], { asTakerFeeRate, asMakerFeeRate, gasFeeAmount });
+      // state = state.set('orderbook', initialOrderbook);
+      // state = state.set('tradeHistory', OrderedMap());
       return state;
     }
     case 'LOAD_TRADE_HISTORY':

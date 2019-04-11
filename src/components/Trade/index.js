@@ -10,7 +10,7 @@ import { calculateTrade } from '../../lib/tradeCalculator';
 import { loginRequest } from '../../actions/account';
 import PerfectScrollbar from 'perfect-scrollbar';
 import './styles.scss';
-import { sleep } from '../../lib/utils';
+import { sleep, getMarketName } from '../../lib/utils';
 
 const mapStateToProps = state => {
   const selector = formValueSelector(TRADE_FORM_ID);
@@ -86,7 +86,7 @@ class Trade extends React.PureComponent {
     return (
       <>
         <div className="title">
-          <div>{currentMarket.id}</div>
+          <div>{currentMarket.baseTokenName}</div>
           <div className="text-secondary">Make a Limit Order</div>
         </div>
         <div className="trade flex-1 flex-column">
@@ -122,7 +122,7 @@ class Trade extends React.PureComponent {
                   <label>Amount</label>
                   <div className="input-group">
                     <Field name="amount" className="form-control" component={'input'} />
-                    <span className="text-secondary unit">{currentMarket.baseToken}</span>
+                    <span className="text-secondary unit">{currentMarket.baseTokenName}</span>
                   </div>
                 </div>
                 <div className="form-group">
@@ -144,7 +144,7 @@ class Trade extends React.PureComponent {
                 </div>
               </div>
               <button type="submit" className={`form-control btn ${side === 'buy' ? 'btn-success' : 'btn-danger'}`}>
-                {side} {currentMarket.baseToken}
+                {side} {currentMarket.baseTokenName}
               </button>
             </form>
           </div>

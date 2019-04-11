@@ -1,6 +1,6 @@
 import React from 'react';
 import { loginRequest, enableMetamask } from '../../actions/account';
-import { updateCurrentMarket } from '../../actions/markets';
+import { updateCurrentMarket, updateCurrentAugur } from '../../actions/markets';
 import { connect } from 'react-redux';
 import './styles.scss';
 
@@ -9,6 +9,8 @@ const mapStateToProps = state => {
     address: state.account.get('address'),
     isLoggedIn: state.account.get('isLoggedIn'),
     currentMarket: state.market.getIn(['markets', 'currentMarket']),
+    currentAugur: state.market.getIn(['augurs', 'currentAugur']),
+    augurs: state.market.getIn(['augurs', 'data']),
     markets: state.market.getIn(['markets', 'data']),
     web3NetworkID: state.config.get('web3NetworkID')
   };
@@ -20,10 +22,37 @@ class Header extends React.PureComponent {
   }
 
   render() {
-    const { currentMarket, markets, dispatch, web3NetworkID } = this.props;
+    const { currentMarket, markets, currentAugur, augurs, dispatch, web3NetworkID } = this.props;
     return (
       <div className="navbar bg-blue navbar-expand-lg">
         <img className="navbar-brand" src={require('../../images/hydro.svg')} alt="hydro" />
+        <div className="dropdown navbar-nav">
+          <button
+            className="btn btn-primary header-dropdown dropdown-toggle"
+            type="button"
+            id="dropdownMenuButton"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false">
+            {currentAugur && currentAugur.title}
+          </button>
+          <div
+            className="dropdown-menu"
+            aria-labelledby="dropdownMenuButton"
+            style={{ maxHeight: 350, overflow: 'auto' }}>
+            {augurs.map(augur => {
+              return (
+                <button
+                  className="dropdown-item"
+                  key={augur.id}
+                  onClick={() => currentAugur.id !== augur.id && dispatch(updateCurrentAugur(augur))}>
+                  {augur.title}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <span style={{ color: 'white', margin: '0 10px 0 10px' }}>Result:</span>
         <div className="dropdown navbar-nav mr-auto">
           <button
             className="btn btn-primary header-dropdown dropdown-toggle"
@@ -32,7 +61,7 @@ class Header extends React.PureComponent {
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false">
-            {currentMarket && currentMarket.id}
+            {currentMarket && currentMarket.baseTokenName}
           </button>
           <div
             className="dropdown-menu"
@@ -44,7 +73,7 @@ class Header extends React.PureComponent {
                   className="dropdown-item"
                   key={market.id}
                   onClick={() => currentMarket.id !== market.id && dispatch(updateCurrentMarket(market))}>
-                  {market.id}
+                  {market.baseTokenName}
                 </button>
               );
             })}

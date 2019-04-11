@@ -10,16 +10,56 @@ export const updateCurrentMarket = currentMarket => {
   };
 };
 
-export const loadMarkets = () => {
+export const updateCurrentAugur = currentAugur => {
+  return async dispatch => {
+    await dispatch({
+      type: 'UPDATE_CURRENT_AUGUR',
+      payload: { currentAugur }
+    });
+
+    await dispatch(loadMarkets(currentAugur.id));
+
+    return;
+  };
+};
+
+export const loadMarkets = augurID => {
   return async (dispatch, getState) => {
-    const res = await api.get(`/markets`);
+    const res = await api.get(`/markets?augurID=${augurID}`);
     if (res.data.status === 0) {
       const markets = res.data.data.markets;
       markets.forEach(formatMarket);
-      return dispatch({
+      await dispatch({
         type: 'LOAD_MARKETS',
         payload: { markets }
       });
+
+      const state = getState();
+
+      if (!state.market.getIn(['markets', 'currentMarket'])) {
+        await dispatch(updateCurrentMarket(markets[0]));
+      }
+    }
+  };
+};
+
+export const loadAugurs = () => {
+  return async (dispatch, getState) => {
+    const res = await api.get(`/augurs`);
+
+    if (res.data.status === 0) {
+      const augurs = res.data.data.augurs;
+      augurs.forEach(formatMarket);
+      await dispatch({
+        type: 'LOAD_AUGURS',
+        payload: { augurs }
+      });
+
+      const state = getState();
+
+      if (!state.market.getIn(['augurs', 'currentAugur'])) {
+        await dispatch(updateCurrentAugur(augurs[0]));
+      }
     }
   };
 };
