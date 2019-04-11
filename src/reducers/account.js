@@ -63,9 +63,10 @@ export default (state = initState, action) => {
       state = state.setIn(['trades', trade.id], trade);
       return state;
     case 'LOAD_TOKEN':
-      const { symbol, balance, allowance, decimals, address } = action.payload;
+      const { symbol, balance, allowance, decimals, address, depositBalance } = action.payload;
       state = state.setIn(['tokensInfo', symbol, 'allowance'], allowance);
       state = state.setIn(['tokensInfo', symbol, 'balance'], balance);
+      state = state.setIn(['tokensInfo', symbol, 'depositBalance'], depositBalance);
       state = state.setIn(['tokensInfo', symbol, 'address'], address);
       if (decimals) {
         state = state.setIn(['tokensInfo', symbol, 'decimals'], decimals);

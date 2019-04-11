@@ -2,8 +2,10 @@ import React from 'react';
 import PerfectScrollbar from 'perfect-scrollbar';
 import Selector from '../Selector';
 import Tokens from './Tokens';
+import DepositTokens from './DepositTokens';
 import Wrap from './Wrap';
 import './styles.scss';
+import env from '../../lib/env';
 
 const OPTIONS = [
   { value: 'tokens', name: 'Tokens' },
@@ -44,7 +46,7 @@ class Wallet extends React.PureComponent {
     const { selectedType } = this.state;
     switch (selectedType) {
       case 'tokens':
-        return <Tokens />;
+        return env.HYDRO_PROXY_MODE === 'deposit' ? <DepositTokens /> : <Tokens />;
       case 'wrap':
         return <Wrap type="wrap" />;
       case 'unwrap':

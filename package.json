@@ -12,6 +12,7 @@
     "perfect-scrollbar": "^1.4.0",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
+    "react-modal": "^3.8.1",
     "react-redux": "^6.0.1",
     "react-scripts": "2.1.5",
     "redux": "^4.0.1",
@@ -28,7 +29,12 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": [">0.2%", "not dead", "not ie <= 11", "not op_mini all"],
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
   "devDependencies": {
     "babel-eslint": "9.0.0",
     "eslint": "5.12.0",

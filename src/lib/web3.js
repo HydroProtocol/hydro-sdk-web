@@ -3,7 +3,8 @@ import { loadAccount, loadAccountBalance, watchToken } from '../actions/account'
 import { loadWeb3NetworkID } from '../actions/config';
 import abi from './abi';
 import env from './env';
-import { callPromise } from './utils';
+import { callPromise, isTokenApproved, isZeroAddress } from './utils';
+import depositProxyABI from './depositProxyABI';
 
 export let web3, Contract;
 const accountWatchers = new Map();
@@ -16,6 +17,195 @@ export const getTokenBalance = (tokenAddress, accountAddress) => {
 export const getAllowance = async (tokenAddress, accountAddress) => {
   const contract = Contract.at(tokenAddress);
   return callPromise(contract.allowance, accountAddress, env.HYDRO_PROXY_ADDRESS);
+};
+
+// for deposit mode
+export const getTokenDepositBalance = async (tokenAddress, accountAddress) => {
+  const contract = web3.eth.contract(depositProxyABI).at(env.HYDRO_PROXY_ADDRESS);
+  return callPromise(contract.balanceOf, tokenAddress, accountAddress);
+};
+
+// for deposit mode
+export const depositToken = (tokenAddress, amount) => {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const accountAddress = state.account.get('address');
+    const tokensInfo = state.account.get('tokensInfo');
+    let symbol;
+    let decimals;
+    let balance;
+    let allowance;
+
+    for (let tokenItem of tokensInfo.toArray()) {
+      console.log('tokenItem: ', tokenItem);
+      const [token, info] = tokenItem;
+      const tokenInfo = info.toJS();
+      if (tokenInfo.address === tokenAddress) {
+        symbol = token;
+        decimals = tokenInfo.decimals;
+        balance = tokenInfo.balance;
+        allowance = tokenInfo.allowance;
+        break;
+      }
+    }
+
+    const value = new BigNumber(amount).multipliedBy(Math.pow(10, decimals));
+    if (value.gt(balance)) {
+      alert('Balance is not enough!');
+      return;
+    }
+
+    const isApproved = isTokenApproved(allowance || new BigNumber('0'));
+    if (!isApproved) {
+      let transactionID = await dispatch(
+        approve(tokenAddress, symbol, '0xf000000000000000000000000000000000000000000000000000000000000000', 'Approve')
+      );
+      if (!transactionID) {
+        return;
+      }
+    }
+
+    const contract = web3.eth.contract(depositProxyABI).at(env.HYDRO_PROXY_ADDRESS);
+
+    let params = {
+      from: accountAddress,
+      to: env.HYDRO_PROXY_ADDRESS,
+      data: contract.depositToken.getData(tokenAddress, value.toString()),
+      value: 0,
+      gas: 100000
+    };
+
+    try {
+      const transactionID = await callPromise(web3.eth.sendTransaction, params);
+
+      const status = 'deposit';
+      alert(`${status} ${symbol} request submitted`);
+      watchTransactionStatus(transactionID, async success => {
+        if (success) {
+          dispatch(watchToken(tokenAddress, symbol));
+          alert(`${status} ${symbol} Successfully`);
+        } else {
+          alert(`${status} ${symbol} Failed`);
+        }
+      });
+      return transactionID;
+    } catch (e) {
+      alert(e);
+    }
+    return null;
+  };
+};
+
+// for deposit mode
+export const depositEther = (tokenAddress, amount) => {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const accountAddress = state.account.get('address');
+    const balance = state.account.get('ethBalance');
+
+    const value = new BigNumber(amount).multipliedBy(Math.pow(10, 18));
+    if (value.gt(balance)) {
+      alert('Balance is not enough!');
+      return;
+    }
+
+    let params = {
+      from: accountAddress,
+      to: env.HYDRO_PROXY_ADDRESS,
+      data: web3.sha3('deposit()').slice(0, 10),
+      value: value.toString(),
+      gas: 80000
+    };
+
+    try {
+      const transactionID = await callPromise(web3.eth.sendTransaction, params);
+
+      const status = 'deposit';
+      const symbol = 'ETH';
+      alert(`${status} ${symbol} request submitted`);
+      watchTransactionStatus(transactionID, async success => {
+        if (success) {
+          dispatch(watchToken(tokenAddress, symbol));
+          alert(`${status} ${symbol} Successfully`);
+        } else {
+          alert(`${status} ${symbol} Failed`);
+        }
+      });
+      return transactionID;
+    } catch (e) {
+      alert(e);
+    }
+    return null;
+  };
+};
+
+// for deposit mode
+export const deposit = (tokenAddress, amount) => {
+  if (isZeroAddress(tokenAddress)) {
+    return depositEther(tokenAddress, amount);
+  }
+  return depositToken(tokenAddress, amount);
+};
+
+// for deposit mode
+export const withdraw = (tokenAddress, amount) => {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const accountAddress = state.account.get('address');
+    const tokensInfo = state.account.get('tokensInfo');
+    let symbol;
+    let decimals;
+    let depositBalance;
+
+    for (let tokenItem of tokensInfo.toArray()) {
+      const [token, info] = tokenItem;
+      const tokenInfo = info.toJS();
+      if (tokenInfo.address === tokenAddress) {
+        symbol = token;
+        decimals = tokenInfo.decimals;
+        depositBalance = tokenInfo.depositBalance;
+        break;
+      }
+    }
+
+    const value = new BigNumber(amount).multipliedBy(Math.pow(10, decimals));
+    if (value.gt(depositBalance)) {
+      alert('Deposit balance is not enough!');
+      return;
+    }
+
+    const contract = web3.eth.contract(depositProxyABI).at(env.HYDRO_PROXY_ADDRESS);
+
+    let params = {
+      from: accountAddress,
+      to: env.HYDRO_PROXY_ADDRESS,
+      data: contract.withdraw.getData(tokenAddress, value.toString()),
+      value: 0,
+      gas: 100000
+    };
+
+    try {
+      const transactionID = await callPromise(web3.eth.sendTransaction, params);
+
+      const status = 'withdraw';
+      if (isZeroAddress(tokenAddress)) {
+        symbol = 'ETH';
+      }
+      alert(`${status} ${symbol} request submitted`);
+      watchTransactionStatus(transactionID, async success => {
+        if (success) {
+          dispatch(watchToken(tokenAddress, symbol));
+          alert(`${status} ${symbol} Successfully`);
+        } else {
+          alert(`${status} ${symbol} Failed`);
+        }
+      });
+      return transactionID;
+    } catch (e) {
+      alert(e);
+    }
+    return null;
+  };
 };
 
 export const personalSign = (message, address) => {

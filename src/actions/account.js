@@ -1,7 +1,9 @@
-import { personalSign, getAllowance, getTokenBalance } from '../lib/web3';
+import { personalSign, getAllowance, getTokenBalance, getTokenDepositBalance } from '../lib/web3';
 import { saveLoginData, loadAccountHydroAuthentication } from '../lib/session';
 import BigNumber from 'bignumber.js';
 import api from '../lib/api';
+import env from '../lib/env';
+import { zeroAddress } from '../lib/utils';
 
 // 从Metamask读取到address，处理登录状态
 export const loadAccount = address => {
@@ -108,6 +110,9 @@ export const loadTokens = () => {
     let tokens = {};
     let promises = [];
 
+    // for deposit mode
+    promises.push(dispatch(loadToken(zeroAddress, 'ETH', 18)));
+
     // load quote tokens first
     for (let i = 0; i < markets.length; i++) {
       const market = markets[i];
@@ -153,6 +158,12 @@ export const loadToken = (tokenAddress, symbol, decimals) => {
       getAllowance(tokenAddress, accountAddress)
     ]);
 
+    // for deposit mode
+    let depositBalance;
+    if (env.HYDRO_PROXY_MODE === 'deposit') {
+      depositBalance = await getTokenDepositBalance(tokenAddress, accountAddress);
+    }
+
     return dispatch({
       type: 'LOAD_TOKEN',
       payload: {
@@ -160,7 +171,8 @@ export const loadToken = (tokenAddress, symbol, decimals) => {
         symbol,
         balance,
         allowance,
-        decimals
+        decimals,
+        depositBalance
       }
     });
   };

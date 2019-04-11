@@ -10,6 +10,13 @@ export const isTokenApproved = allowance => {
   return allowance.gt(10 ** 30);
 };
 
+// for deposit mode
+export const zeroAddress = '0x0000000000000000000000000000000000000000';
+
+export const isZeroAddress = address => {
+  return address === zeroAddress;
+};
+
 export const callPromise = (fn, ...args) => {
   return new Promise((resolve, reject) => {
     fn(...args, (err, result) => {
