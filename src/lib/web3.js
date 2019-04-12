@@ -3,7 +3,7 @@ import { loadAccount, loadAccountBalance, watchToken } from '../actions/account'
 import { loadWeb3NetworkID } from '../actions/config';
 import abi from './abi';
 import env from './env';
-import { callPromise, isTokenApproved, isZeroAddress } from './utils';
+import { callPromise, isTokenApproved, isZeroAddress, toastGreen, toastRed } from './utils';
 import depositProxyABI from './depositProxyABI';
 
 export let web3, Contract;
@@ -37,7 +37,6 @@ export const depositToken = (tokenAddress, amount) => {
     let allowance;
 
     for (let tokenItem of tokensInfo.toArray()) {
-      console.log('tokenItem: ', tokenItem);
       const [token, info] = tokenItem;
       const tokenInfo = info.toJS();
       if (tokenInfo.address === tokenAddress) {
@@ -51,7 +50,7 @@ export const depositToken = (tokenAddress, amount) => {
 
     const value = new BigNumber(amount).multipliedBy(Math.pow(10, decimals));
     if (value.gt(balance)) {
-      alert('Balance is not enough!');
+      toastRed('Balance is not enough!');
       return;
     }
 
@@ -79,18 +78,18 @@ export const depositToken = (tokenAddress, amount) => {
       const transactionID = await callPromise(web3.eth.sendTransaction, params);
 
       const status = 'deposit';
-      alert(`${status} ${symbol} request submitted`);
+      toastGreen(`${status} ${symbol} request submitted`);
       watchTransactionStatus(transactionID, async success => {
         if (success) {
           dispatch(watchToken(tokenAddress, symbol));
-          alert(`${status} ${symbol} Successfully`);
+          toastGreen(`${status} ${symbol} Successfully`);
         } else {
-          alert(`${status} ${symbol} Failed`);
+          toastRed(`${status} ${symbol} Failed`);
         }
       });
       return transactionID;
     } catch (e) {
-      alert(e);
+      toastGreen(e);
     }
     return null;
   };
@@ -105,7 +104,7 @@ export const depositEther = (tokenAddress, amount) => {
 
     const value = new BigNumber(amount).multipliedBy(Math.pow(10, 18));
     if (value.gt(balance)) {
-      alert('Balance is not enough!');
+      toastRed('Balance is not enough!');
       return;
     }
 
@@ -122,18 +121,18 @@ export const depositEther = (tokenAddress, amount) => {
 
       const status = 'deposit';
       const symbol = 'ETH';
-      alert(`${status} ${symbol} request submitted`);
+      toastGreen(`${status} ${symbol} request submitted`);
       watchTransactionStatus(transactionID, async success => {
         if (success) {
           dispatch(watchToken(tokenAddress, symbol));
-          alert(`${status} ${symbol} Successfully`);
+          toastGreen(`${status} ${symbol} Successfully`);
         } else {
-          alert(`${status} ${symbol} Failed`);
+          toastRed(`${status} ${symbol} Failed`);
         }
       });
       return transactionID;
     } catch (e) {
-      alert(e);
+      toastRed(e);
     }
     return null;
   };
@@ -170,7 +169,7 @@ export const withdraw = (tokenAddress, amount) => {
 
     const value = new BigNumber(amount).multipliedBy(Math.pow(10, decimals));
     if (value.gt(depositBalance)) {
-      alert('Deposit balance is not enough!');
+      toastRed('Deposit balance is not enough!');
       return;
     }
 
@@ -191,18 +190,18 @@ export const withdraw = (tokenAddress, amount) => {
       if (isZeroAddress(tokenAddress)) {
         symbol = 'ETH';
       }
-      alert(`${status} ${symbol} request submitted`);
+      toastGreen(`${status} ${symbol} request submitted`);
       watchTransactionStatus(transactionID, async success => {
         if (success) {
           dispatch(watchToken(tokenAddress, symbol));
-          alert(`${status} ${symbol} Successfully`);
+          toastGreen(`${status} ${symbol} Successfully`);
         } else {
-          alert(`${status} ${symbol} Failed`);
+          toastRed(`${status} ${symbol} Failed`);
         }
       });
       return transactionID;
     } catch (e) {
-      alert(e);
+      toastRed(e);
     }
     return null;
   };
@@ -230,18 +229,18 @@ export const wrapETH = amount => {
     try {
       const transactionID = await callPromise(web3.eth.sendTransaction, params);
 
-      alert(`Wrap ETH request submitted`);
+      toastGreen(`Wrap ETH request submitted`);
       watchTransactionStatus(transactionID, async success => {
         if (success) {
           dispatch(watchToken(WETH.address, WETH.symbol));
-          alert('Wrap ETH Successfully');
+          toastGreen('Wrap ETH Successfully');
         } else {
-          alert('Wrap ETH Failed');
+          toastRed('Wrap ETH Failed');
         }
       });
       return transactionID;
     } catch (e) {
-      alert(e);
+      toastRed(e);
     }
     return null;
   };
@@ -266,18 +265,18 @@ export const unwrapWETH = amount => {
     try {
       const transactionID = await callPromise(web3.eth.sendTransaction, params);
 
-      alert(`Unwrap WETH request submitted`);
+      toastGreen(`Unwrap WETH request submitted`);
       watchTransactionStatus(transactionID, async success => {
         if (success) {
           dispatch(watchToken(WETH.address, WETH.symbol));
-          alert('Wrap ETH Successfully');
+          toastGreen('Wrap ETH Successfully');
         } else {
-          alert('Wrap ETH Failed');
+          toastRed('Wrap ETH Failed');
         }
       });
       return transactionID;
     } catch (e) {
-      alert(e);
+      toastRed(e);
     }
     return null;
   };
@@ -320,18 +319,18 @@ export const approve = (tokenAddress, symbol, allowance, action) => {
     try {
       const transactionID = await callPromise(web3.eth.sendTransaction, params);
 
-      alert(`${status} ${symbol} request submitted`);
+      toastGreen(`${status} ${symbol} request submitted`);
       watchTransactionStatus(transactionID, async success => {
         if (success) {
           dispatch(watchToken(tokenAddress, symbol));
-          alert(`${status} ${symbol} Successfully`);
+          toastGreen(`${status} ${symbol} Successfully`);
         } else {
-          alert(`${status} ${symbol} Failed`);
+          toastRed(`${status} ${symbol} Failed`);
         }
       });
       return transactionID;
     } catch (e) {
-      alert(e);
+      toastRed(e);
     }
     return null;
   };
@@ -353,7 +352,7 @@ const watchTransactionStatus = (txID, callback) => {
       } else if (callback) {
         callback(result.status === '0x1');
       } else {
-        alert('success');
+        toastGreen('success');
       }
     });
   };

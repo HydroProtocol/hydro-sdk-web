@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import Toastify from 'toastify-js';
 
 export const sleep = time => new Promise(r => setTimeout(r, time));
 
@@ -26,4 +27,22 @@ export const callPromise = (fn, ...args) => {
       resolve(result);
     });
   });
+};
+
+export const toastGreen = (msg, duration = 5000) => {
+  Toastify({
+    text: msg,
+    duration,
+    gravity: 'bottom',
+    backgroundColor: '#00d99f'
+  }).showToast();
+};
+
+export const toastRed = (msg, duration = 5000) => {
+  Toastify({
+    text: msg,
+    duration,
+    gravity: 'bottom',
+    backgroundColor: '#ff6f75'
+  }).showToast();
 };

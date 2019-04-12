@@ -8402,6 +8402,11 @@ to-regex@^3.0.1, to-regex@^3.0.2:
     regex-not "^1.0.2"
     safe-regex "^1.1.0"
 
+toastify-js@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/toastify-js/-/toastify-js-1.3.2.tgz#d48966773591c96542f9f7b235056b20015f9e78"
+  integrity sha512-VququUBiUxg4lepJ/sGsN3HoZHO2WfU5sGv/RZKCP9o8ZtqJgrMAYjLh0DORRCNc25y4fYv/9i6IsbB0K0y15w==
+
 topo@2.x.x:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/topo/-/topo-2.0.2.tgz#cd5615752539057c0dc0491a621c3bc6fbe1d182"
