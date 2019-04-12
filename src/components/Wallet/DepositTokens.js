@@ -96,28 +96,23 @@ class Tokens extends React.PureComponent {
       return null;
     });
     return (
-      <div className="flex-column">
-        <div className="token flex flex-1">
-          <div className="col-6">ETH</div>
-          <div className="col-6 text-right">{ethBalance.toFixed(5)}</div>
-        </div>
-
-        <table>
+      <div className=" lex-1 position-relative overflow-hidden">
+        <table className="table">
           <thead>
-            <tr>
+            <tr className="text-secondary">
               <td>Token</td>
-              <td>Account Balance</td>
-              <td>Deposit Balance</td>
-              <td>Available Balance</td>
-              <td>Actions</td>
+              <td className="text-right">Account Balance</td>
+              <td className="text-right">Deposit Balance</td>
+              <td className="text-right">Available Balance</td>
+              <td className="text-right">Actions</td>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>ETH</td>
-              <td>{ethBalance.toFixed(5)}</td>
-              <td>{toUnitAmount(depositBalanceETH, 18).toFixed(5)}</td>
-              <td>
+              <td className="text-right">{ethBalance.toFixed(5)}</td>
+              <td className="text-right">{toUnitAmount(depositBalanceETH, 18).toFixed(5)}</td>
+              <td className="text-right">
                 <div
                   className="flex-column"
                   key={toolTipTitleETH}
@@ -129,7 +124,7 @@ class Tokens extends React.PureComponent {
                   {availableBalanceETH}
                 </div>
               </td>
-              <td>
+              <td className="text-right">
                 <div className="btn-group" role="group" aria-label="deposit-withdraw">
                   <button
                     type="button"
@@ -161,9 +156,9 @@ class Tokens extends React.PureComponent {
               return (
                 <tr key={token}>
                   <td>{token}</td>
-                  <td>{toUnitAmount(balance, decimals).toFixed(5)}</td>
-                  <td>{toUnitAmount(depositBalance, decimals).toFixed(5)}</td>
-                  <td>
+                  <td className="text-right">{toUnitAmount(balance, decimals).toFixed(5)}</td>
+                  <td className="text-right">{toUnitAmount(depositBalance, decimals).toFixed(5)}</td>
+                  <td className="text-right">
                     <div
                       className="flex-column"
                       key={toolTipTitle}
@@ -175,7 +170,7 @@ class Tokens extends React.PureComponent {
                       {availableBalance}
                     </div>
                   </td>
-                  <td>
+                  <td className="text-right">
                     <div className="btn-group" role="group" aria-label="deposit-withdraw">
                       <button
                         type="button"
