@@ -15,6 +15,8 @@ export const initState = Map({
 
 export default (state = initState, action) => {
   switch (action.type) {
+    case 'LOAD_MARKETS':
+      return state.set('tokensInfo', Map());
     case 'LOAD_ACCOUNT':
       state = state.set('address', action.payload.address);
       return state;
