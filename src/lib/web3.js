@@ -89,7 +89,7 @@ export const depositToken = (tokenAddress, amount) => {
       });
       return transactionID;
     } catch (e) {
-      toastGreen(e);
+      toastRed(e);
     }
     return null;
   };
