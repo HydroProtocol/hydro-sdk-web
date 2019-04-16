@@ -3,29 +3,33 @@ import { connect } from 'react-redux';
 import { loadTokens } from '../../actions/account';
 import { toUnitAmount, isTokenApproved } from '../../lib/utils';
 import BigNumber from 'bignumber.js';
-import { enable, disable } from '../../lib/web3';
+import { enable, disable } from '../../lib/connection';
 
 const mapStateToProps = state => {
+  const selectedType = state.wallet.get('selectedType');
+  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
   return {
     tokensInfo: state.account.get('tokensInfo'),
-    address: state.account.get('address'),
+    address,
     lockedBalances: state.account.get('lockedBalances'),
-    ethBalance: toUnitAmount(state.account.get('ethBalance'), 18)
+    isLoggedIn: state.account.getIn(['isLoggedIn', address]),
+    ethBalance: toUnitAmount(state.wallet.getIn(['accounts', selectedType, 'balance']), 18)
   };
 };
 
 class Tokens extends React.PureComponent {
   componentDidMount() {
-    const { address, dispatch } = this.props;
-    if (address) {
+    const { address, dispatch, isLoggedIn } = this.props;
+    if (address && isLoggedIn) {
       dispatch(loadTokens());
     }
   }
 
   componentDidUpdate(prevProps) {
-    const { address, dispatch } = this.props;
+    const { address, dispatch, isLoggedIn } = this.props;
     const accountChange = address !== prevProps.address;
-    if (address && accountChange) {
+    const loggedInChange = isLoggedIn !== prevProps.isLoggedIn;
+    if (address && isLoggedIn && (accountChange || loggedInChange)) {
       dispatch(loadTokens());
     }
   }

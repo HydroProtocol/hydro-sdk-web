@@ -9,14 +9,3 @@ export const toUnitAmount = (amount, decimals) => {
 export const isTokenApproved = allowance => {
   return allowance.gt(10 ** 30);
 };
-
-export const callPromise = (fn, ...args) => {
-  return new Promise((resolve, reject) => {
-    fn(...args, (err, result) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    });
-  });
-};

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { loadMarkets, loadTradeHistory } from './actions/markets';
-import { initWatchers } from './lib/web3';
+import { initConnector } from './lib/connection';
 import Header from './components/Header';
 import WebsocketConnector from './components/WebsocketConnector';
 import OrderBook from './components/Orderbook';
@@ -20,7 +20,7 @@ class App extends React.PureComponent {
   componentDidMount() {
     const { dispatch, currentMarket } = this.props;
     dispatch(loadMarkets());
-    dispatch(initWatchers());
+    initConnector(dispatch);
     if (currentMarket) {
       dispatch(loadTradeHistory(currentMarket.id));
     }

@@ -2,17 +2,19 @@ import axios from 'axios';
 import env from './env';
 import { store } from '../index';
 import { cleanLoginDate, loadAccountHydroAuthentication } from './session';
+import { logout } from '../actions/account';
 
 const getAxiosInstance = () => {
   const state = store.getState();
-  const address = state.account.get('address');
-  const jwt = loadAccountHydroAuthentication(address);
+  const selectedType = state.wallet.get('selectedType');
+  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
+  const hydroAuthentication = loadAccountHydroAuthentication(address);
   let instance;
 
-  if (jwt) {
+  if (hydroAuthentication) {
     instance = axios.create({
       headers: {
-        'Hydro-Authentication': jwt
+        'Hydro-Authentication': hydroAuthentication
       }
     });
   } else {
@@ -21,8 +23,8 @@ const getAxiosInstance = () => {
 
   instance.interceptors.response.use(function(response) {
     if (response.data && response.data.status === -11) {
-      const address = state.account.get('address');
       if (address) {
+        store.dispatch(logout(address));
         cleanLoginDate(address);
       }
     }

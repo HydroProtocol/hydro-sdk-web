@@ -16,6 +16,8 @@ const mapStateToProps = state => {
   const selector = formValueSelector(TRADE_FORM_ID);
   const bids = state.market.getIn(['orderbook', 'bids']);
   const asks = state.market.getIn(['orderbook', 'asks']);
+  const selectedType = state.wallet.get('selectedType');
+  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
 
   return {
     initialValues: {
@@ -37,8 +39,8 @@ const mapStateToProps = state => {
     },
     currentMarket: state.market.getIn(['markets', 'currentMarket']),
     hotTokenAmount: state.config.get('hotTokenAmount'),
-    address: state.account.get('address'),
-    isLoggedIn: state.account.get('isLoggedIn'),
+    address,
+    isLoggedIn: state.account.getIn(['isLoggedIn', address]),
     price: new BigNumber(selector(state, 'price') || 0),
     amount: new BigNumber(selector(state, 'amount') || 0),
     total: new BigNumber(selector(state, 'total') || 0),
@@ -108,7 +110,7 @@ class Trade extends React.PureComponent {
           </ul>
           <div className="flex flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
             <form
-              className="flex-column text-secondary flex-1 justify-content-between"
+              className="form flex-column text-secondary flex-1 justify-content-between"
               onSubmit={handleSubmit(() => this.submit())}>
               <div>
                 <div className="form-group">

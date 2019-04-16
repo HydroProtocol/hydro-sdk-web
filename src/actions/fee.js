@@ -1,5 +1,5 @@
 import { setConfigs } from './config';
-import { getTokenBalance } from '../lib/web3';
+import { getTokenBalance } from '../lib/connection';
 import env from '../lib/env';
 
 export let hotDiscountRules = [];
@@ -19,7 +19,7 @@ export const getHotTokenAmount = () => {
     if (!address) {
       return;
     }
-    const hotTokenAmount = await getTokenBalance(hotContract, address);
+    const hotTokenAmount = await dispatch(getTokenBalance(hotContract, address));
     dispatch(setConfigs({ hotTokenAmount }));
   };
 };

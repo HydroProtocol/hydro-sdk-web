@@ -1,4 +1,4 @@
-import { personalSign } from '../lib/web3';
+import { connector } from '../lib/connection';
 import api from '../lib/api';
 
 export const TRADE_FORM_ID = 'TRADE';
@@ -24,7 +24,7 @@ export const trade = (side, price, amount, orderType = 'limit', expires = 86400 
 const createOrder = (side, price, amount, orderType, expires) => {
   return async (dispatch, getState) => {
     const state = getState();
-    const address = state.account.get('address');
+    const selectedType = state.wallet.get('selectedType');
     const currentMarket = state.market.getIn(['markets', 'currentMarket']);
 
     const buildOrderResponse = await api.post('/orders/build', {
@@ -43,7 +43,9 @@ const createOrder = (side, price, amount, orderType, expires) => {
     const orderParams = buildOrderResponse.data.data.order;
     const { id: orderID } = orderParams;
     try {
-      const signature = await personalSign(orderID, address);
+      const connection = connector.getConnection(selectedType);
+      const signature = await connection.personalSignMessage(orderID);
+      console.log('order: ', signature);
       const orderSignature = '0x' + signature.slice(130) + '0'.repeat(62) + signature.slice(2, 130);
       const placeOrderResponse = await api.post('/orders', {
         orderID,

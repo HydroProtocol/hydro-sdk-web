@@ -10,10 +10,12 @@ import { tradeUpdate, marketTrade } from '../../actions/trade';
 import { sleep } from '../../lib/utils';
 
 const mapStateToProps = state => {
+  const selectedType = state.wallet.get('selectedType');
+  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
   return {
-    address: state.account.get('address'),
+    address,
     currentMarket: state.market.getIn(['markets', 'currentMarket']),
-    isLoggedIn: state.account.get('isLoggedIn'),
+    isLoggedIn: state.account.getIn(['isLoggedIn', address]),
     markets: state.market.getIn(['markets', 'data'])
   };
 };

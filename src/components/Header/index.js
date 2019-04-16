@@ -2,12 +2,16 @@ import React from 'react';
 import { loginRequest, enableMetamask } from '../../actions/account';
 import { updateCurrentMarket } from '../../actions/markets';
 import { connect } from 'react-redux';
+import { Wallet, formatProps } from 'hydro-sdk-wallet';
 import './styles.scss';
 
 const mapStateToProps = state => {
+  const selectedType = state.wallet.get('selectedType');
+  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
   return {
-    address: state.account.get('address'),
-    isLoggedIn: state.account.get('isLoggedIn'),
+    wallet: state.wallet,
+    address,
+    isLoggedIn: state.account.getIn(['isLoggedIn', address]),
     currentMarket: state.market.getIn(['markets', 'currentMarket']),
     markets: state.market.getIn(['markets', 'data']),
     web3NetworkID: state.config.get('web3NetworkID')
@@ -20,7 +24,7 @@ class Header extends React.PureComponent {
   }
 
   render() {
-    const { currentMarket, markets, dispatch, web3NetworkID } = this.props;
+    const { currentMarket, markets, dispatch, web3NetworkID, wallet } = this.props;
     return (
       <div className="navbar bg-blue navbar-expand-lg">
         <img className="navbar-brand" src={require('../../images/hydro.svg')} alt="hydro" />
@@ -56,13 +60,14 @@ class Header extends React.PureComponent {
           </span>
         )}
         <a
-          href="https://hydroprotocol.io/docs/overview/what-is-hydro.html"
+          href="https://hydroprotocol.io/developers/docs/overview/what-is-hydro.html"
           className="btn btn-primary"
           target="_blank"
           rel="noopener noreferrer"
           style={{ marginRight: 12 }}>
           DOCUMENTATION
         </a>
+        <Wallet {...formatProps(wallet)} />
         {this.renderAccount()}
       </div>
     );
@@ -71,11 +76,11 @@ class Header extends React.PureComponent {
   renderAccount() {
     const { address, dispatch, isLoggedIn } = this.props;
     if (isLoggedIn && address) {
-      return <div className="btn btn-primary">{address}</div>;
+      return null;
     } else if (address) {
       return (
-        <button className="btn btn-primary" onClick={() => dispatch(loginRequest(address))}>
-          Click to connect Metamask
+        <button className="btn btn-success" style={{ marginLeft: 12 }} onClick={() => dispatch(loginRequest())}>
+          connect
         </button>
       );
     } else {

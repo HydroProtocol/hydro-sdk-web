@@ -4,10 +4,12 @@ import { loadTrades } from '../../actions/account';
 import PerfectScrollbar from 'perfect-scrollbar';
 
 const mapStateToProps = state => {
+  const selectedType = state.wallet.get('selectedType');
+  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
   return {
-    address: state.account.get('address'),
+    address,
     trades: state.account.get('trades'),
-    isLoggedIn: state.account.get('isLoggedIn')
+    isLoggedIn: state.account.getIn(['isLoggedIn', address])
   };
 };
 

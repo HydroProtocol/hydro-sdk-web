@@ -1,14 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import BigNumber from 'bignumber.js';
-import { wrapETH, unwrapWETH } from '../../lib/web3';
+import { wrapETH, unwrapWETH } from '../../lib/connection';
 import { toUnitAmount } from '../../lib/utils';
 
 const mapStateToProps = state => {
   const WETH = state.config.get('WETH');
+  const selectedType = state.wallet.get('selectedType');
   return {
-    ethBalance: toUnitAmount(state.account.get('ethBalance'), 18),
-    wethBalance: toUnitAmount(state.account.getIn(['tokenBalances', 'WETH']) || new BigNumber(0), WETH.decimals)
+    ethBalance: toUnitAmount(state.wallet.getIn(['accounts', selectedType, 'balance']), 18),
+    wethBalance: toUnitAmount(state.account.getIn(['tokensInfo', 'WETH', 'balance']) || new BigNumber(0), WETH.decimals)
   };
 };
 
@@ -33,7 +34,7 @@ class Wrap extends React.PureComponent {
     const isWrap = type === 'wrap';
 
     return (
-      <form className="flex-column text-secondary flex-1 justify-content-between block">
+      <form className="form flex-column text-secondary flex-1 justify-content-between block">
         <div className="form-group">
           <label className="text-secondary">
             Amount ({isWrap ? ethBalance.toFixed(8) : wethBalance.toFixed(8)} Max)

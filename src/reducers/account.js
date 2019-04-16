@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 
 export const initState = Map({
   address: null,
-  isLoggedIn: false,
+  isLoggedIn: Map(),
   ethBalance: new BigNumber('0'),
   lockedBalances: Map(),
   tokensInfo: Map(),
@@ -27,7 +27,10 @@ export default (state = initState, action) => {
       }
       return state;
     case 'LOGIN':
-      state = state.set('isLoggedIn', true);
+      state = state.setIn(['isLoggedIn', action.payload.address], true);
+      return state;
+    case 'LOGOUT':
+      state = state.setIn(['isLoggedIn', action.payload.address], false);
       return state;
     case 'LOAD_ORDERS':
       state = state.set('orders', OrderedMap());

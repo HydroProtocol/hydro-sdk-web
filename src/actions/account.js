@@ -1,4 +1,4 @@
-import { personalSign, getAllowance, getTokenBalance } from '../lib/web3';
+import { getAllowance, getTokenBalance, connector } from '../lib/connection';
 import { saveLoginData, loadAccountHydroAuthentication } from '../lib/session';
 import BigNumber from 'bignumber.js';
 import api from '../lib/api';
@@ -14,10 +14,10 @@ export const loadAccount = address => {
       type: 'LOAD_ACCOUNT',
       payload: { address }
     });
-    const isLoggedIn = getState().account.get('isLoggedIn');
-    const jwt = loadAccountHydroAuthentication(address);
-    if (jwt && !isLoggedIn) {
-      dispatch(login(address, jwt));
+    const isLoggedIn = getState().account.getIn([address, 'isLoggedIn']);
+    const hydroAuthentication = loadAccountHydroAuthentication(address);
+    if (hydroAuthentication && !isLoggedIn) {
+      dispatch(login(address, hydroAuthentication));
     }
   };
 };
@@ -48,10 +48,14 @@ export const enableMetamask = () => {
 };
 
 // request ddex private auth token
-export const loginRequest = address => {
+export const loginRequest = () => {
   return async (dispatch, getState) => {
     const message = 'HYDRO-AUTHENTICATION';
-    const signature = await personalSign(message, address);
+    const state = getState();
+    const selectedType = state.wallet.get('selectedType');
+    const address = state.wallet.getIn(['accounts', selectedType, 'address']);
+    const connection = connector.getConnection(selectedType);
+    const signature = await connection.personalSignMessage(message);
     if (!signature) {
       return;
     }
@@ -65,7 +69,13 @@ export const login = (address, hydroAuthentication) => {
   return (dispatch, getState) => {
     saveLoginData(address, hydroAuthentication);
     dispatch(loadAccountLockedBalance());
-    dispatch({ type: 'LOGIN' });
+    dispatch({ type: 'LOGIN', payload: { address } });
+  };
+};
+
+export const logout = address => {
+  return dispatch => {
+    dispatch({ type: 'LOGOUT', payload: { address } });
   };
 };
 
@@ -98,7 +108,8 @@ export const updateTokenLockedBalances = lockedBalances => {
 export const loadTokens = () => {
   return async (dispatch, getState) => {
     const state = getState();
-    const accountAddress = state.account.get('address');
+    const selectedType = state.wallet.get('selectedType');
+    const accountAddress = state.wallet.getIn(['accounts', selectedType, 'address']);
 
     if (!accountAddress) {
       return;
@@ -143,14 +154,16 @@ export const watchToken = (tokenAddress, symbol) => {
 
 export const loadToken = (tokenAddress, symbol, decimals) => {
   return async (dispatch, getState) => {
-    const accountAddress = getState().account.get('address');
+    const state = getState();
+    const selectedType = state.wallet.get('selectedType');
+    const accountAddress = state.wallet.getIn(['accounts', selectedType, 'address']);
     if (!accountAddress) {
       return;
     }
 
     const [balance, allowance] = await Promise.all([
-      getTokenBalance(tokenAddress, accountAddress),
-      getAllowance(tokenAddress, accountAddress)
+      dispatch(getTokenBalance(tokenAddress, accountAddress)),
+      dispatch(getAllowance(tokenAddress, accountAddress))
     ]);
 
     return dispatch({

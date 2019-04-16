@@ -4,9 +4,11 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import { loadOrders, cancelOrder } from '../../actions/account';
 
 const mapStateToProps = state => {
+  const selectedType = state.wallet.get('selectedType');
+  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
   return {
     orders: state.account.get('orders'),
-    isLoggedIn: state.account.get('isLoggedIn')
+    isLoggedIn: state.account.getIn(['isLoggedIn', address])
   };
 };
 
