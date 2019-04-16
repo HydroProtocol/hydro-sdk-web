@@ -52,7 +52,7 @@ class Header extends React.PureComponent {
             })}
           </div>
         </div>
-        <span style={{ color: 'white', margin: '0 10px 0 10px' }}>Result:</span>
+        <span style={{ color: 'white', margin: '0 10px 0 10px' }}>Bet on:</span>
         <div className="dropdown navbar-nav mr-auto">
           <button
             className="btn btn-primary header-dropdown dropdown-toggle"
