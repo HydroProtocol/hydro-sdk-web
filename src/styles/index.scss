@@ -138,5 +138,9 @@ form {
         display: flex;
         flex-direction: column;
         overflow: hidden;
+
+        &.trade {
+            max-width: 430px;
+        }
     }
 }
