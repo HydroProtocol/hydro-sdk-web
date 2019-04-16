@@ -118,7 +118,7 @@ table {
     border-bottom: 0;
 }
 form {
-    margin: 12px 0;
+    margin: $gapSize 0;
     padding: 0 24px;
 }
 .app {
@@ -128,7 +128,7 @@ form {
     height: 100vh;
     .title {
         font-size: 14px;
-        padding: 12px;
+        padding: $gapSize;
         height: 67px;
         border-bottom: 1px solid $borderGrey;
     }
