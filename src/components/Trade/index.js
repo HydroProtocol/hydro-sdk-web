@@ -35,7 +35,9 @@ const mapStateToProps = state => {
       marketOrderWorstTotalQuote: new BigNumber(0),
       marketOrderWorstTotalBase: new BigNumber(0)
     },
+    currentAugur: state.market.getIn(['augurs', 'currentAugur']),
     currentMarket: state.market.getIn(['markets', 'currentMarket']),
+    markets: state.market.getIn(['markets', 'data']),
     hotTokenAmount: state.config.get('hotTokenAmount'),
     address: state.account.get('address'),
     isLoggedIn: state.account.get('isLoggedIn'),
@@ -78,7 +80,7 @@ class Trade extends React.PureComponent {
   }
 
   render() {
-    const { dispatch, side, handleSubmit, currentMarket, total, gasFee, tradeFee, subtotal } = this.props;
+    const { dispatch, side, handleSubmit, currentMarket, total, gasFee, tradeFee, subtotal, currentAugur } = this.props;
     if (!currentMarket) {
       return null;
     }
@@ -111,37 +113,73 @@ class Trade extends React.PureComponent {
               className="flex-column text-secondary flex-1 justify-content-between"
               onSubmit={handleSubmit(() => this.submit())}>
               <div>
-                <div className="form-group">
-                  <label>Price</label>
-                  <div className="input-group">
-                    <Field name="price" className="form-control" component={'input'} />
-                    <span className="text-secondary unit">{currentMarket.quoteToken}</span>
+                <div>
+                  <div className="form-group">
+                    <label>Price</label>
+                    <div className="input-group">
+                      <Field
+                        name="price"
+                        className="form-control"
+                        autoComplete="off"
+                        min="0"
+                        type="number"
+                        max="1"
+                        step="0.001"
+                        component={'input'}
+                      />
+                      <span className="text-secondary unit">{currentMarket.quoteToken}</span>
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>Amount</label>
+                    <div className="input-group">
+                      <Field name="amount" className="form-control" autoComplete="off" component={'input'} />
+                      <span className="text-secondary unit">{currentMarket.baseTokenName}</span>
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <div className="form-title">Order Summary</div>
+                    <div className="list">
+                      <div className="item flex justify-content-between">
+                        <div className="name">Order</div>
+                        <div className="name">{subtotal.toFixed(currentMarket.priceDecimals)}</div>
+                      </div>
+                      <div className="item flex justify-content-between">
+                        <div className="name">Fees</div>
+                        <div className="name">{gasFee.plus(tradeFee).toFixed(currentMarket.priceDecimals)}</div>
+                      </div>
+                      <div className="item flex justify-content-between">
+                        <div className="name">Total</div>
+                        <div className="name">{total.toFixed(currentMarket.priceDecimals)}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Amount</label>
-                  <div className="input-group">
-                    <Field name="amount" className="form-control" component={'input'} />
-                    <span className="text-secondary unit">{currentMarket.baseTokenName}</span>
+                  <div className="form-title">
+                    Diagrams <small>(fake data for now)</small>
                   </div>
+                  {this.renderDiagrams()}
                 </div>
                 <div className="form-group">
-                  <div className="form-title">Order Summary</div>
-                  <div className="list">
-                    <div className="item flex justify-content-between">
-                      <div className="name">Order</div>
-                      <div className="name">{subtotal.toFixed(currentMarket.priceDecimals)}</div>
-                    </div>
-                    <div className="item flex justify-content-between">
-                      <div className="name">Fees</div>
-                      <div className="name">{gasFee.plus(tradeFee).toFixed(currentMarket.priceDecimals)}</div>
-                    </div>
-                    <div className="item flex justify-content-between">
-                      <div className="name">Total</div>
-                      <div className="name">{total.toFixed(currentMarket.priceDecimals)}</div>
+                  <div className="form-title">Description</div>
+                  <div dangerouslySetInnerHTML={{ __html: currentAugur.description }} />
+                </div>
+                {currentAugur.category === 'scalar' ? (
+                  <div className="form-group">
+                    <div className="form-title">Range</div>
+                    <div className="list">
+                      <div className="item flex justify-content-between">
+                        <span>Mininum:</span>
+                        <span>{currentAugur.minimum}</span>
+                      </div>
+                      <div className="item flex justify-content-between">
+                        <span>Maxinum:</span>
+                        <span>{currentAugur.maximum}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : null}
               </div>
               <button type="submit" className={`form-control btn ${side === 'buy' ? 'btn-success' : 'btn-danger'}`}>
                 {side} {currentMarket.baseTokenName}
@@ -150,6 +188,45 @@ class Trade extends React.PureComponent {
           </div>
         </div>
       </>
+    );
+  }
+
+  randomFakePercentage = num => {
+    let res = [];
+    for (let i = 0; i < num; i++) {
+      res.push(Math.random());
+    }
+    const sum = res.reduce((acc, c) => acc + c, 0);
+    res = res.map(x => Math.floor((x / sum) * 100));
+
+    for (let i = 0, s = 0; i < num; i++) {
+      if (i === num - 1) {
+        res[num - 1] = 100 - s;
+      } else {
+        s += res[i];
+      }
+    }
+    return res;
+  };
+
+  renderDiagrams() {
+    const { markets } = this.props;
+    const ms = markets.toJS();
+    const percenntages = this.randomFakePercentage(ms.length);
+    return (
+      <table className="list marketDiagrams">
+        {ms.map((market, index) => {
+          return (
+            <tr key={market.id} className="item marketDiagram">
+              <td>{market.baseTokenName}</td>
+              <td>
+                <div className={`option-color-${index}`} style={{ width: `${percenntages[index]}%` }} />
+              </td>
+              <td>{percenntages[index]}%</td>
+            </tr>
+          );
+        })}
+      </table>
     );
   }
 

@@ -35,3 +35,52 @@
         }
     }
 }
+
+.marketDiagrams {
+    width: 100%;
+
+    td:first-child {
+        width: 100px;
+    }
+
+    td:nth-child(2) {
+        position: relative;
+
+        div {
+            position: absolute;
+            left: 0;
+            top: 4px;
+            bottom: 4px;
+            width: 0;
+        }
+    }
+
+    td:last-child {
+        width: 24px;
+        text-align: right;
+    }
+}
+
+.option-color-0 {
+    background-color: #32cd32;
+}
+
+.option-color-1 {
+    background-color: #ff6347;
+}
+
+.option-color-2 {
+    background-color: #6a5acd;
+}
+
+.option-color-3 {
+    background-color: #87ceeb;
+}
+
+.option-color-4 {
+    background-color: #db7093;
+}
+
+.option-color-5 {
+    background-color: #ffa07a;
+}
