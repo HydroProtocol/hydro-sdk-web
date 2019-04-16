@@ -27,13 +27,15 @@ class Wallet extends React.PureComponent {
       <>
         <div className="title flex justify-content-between align-items-center">
           <div>Wallet</div>
-          <Selector
-            options={OPTIONS}
-            selectedValue={selectedType}
-            handleClick={option => {
-              this.setState({ selectedType: option.value });
-            }}
-          />
+          {env.HYDRO_PROXY_MODE !== 'deposit' && (
+            <Selector
+              options={OPTIONS}
+              selectedValue={selectedType}
+              handleClick={option => {
+                this.setState({ selectedType: option.value });
+              }}
+            />
+          )}
         </div>
         <div className="flex-column flex-1 position-relative overflow-hidden" ref={ref => this.setRef(ref)}>
           {this.renderTabPanel()}
