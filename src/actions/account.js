@@ -1,4 +1,4 @@
-import { getAllowance, getTokenBalance, connector } from '../lib/connection';
+import { getAllowance, getTokenBalance } from '../lib/wallet';
 import { saveLoginData, loadAccountHydroAuthentication } from '../lib/session';
 import BigNumber from 'bignumber.js';
 import api from '../lib/api';
@@ -52,10 +52,10 @@ export const loginRequest = () => {
   return async (dispatch, getState) => {
     const message = 'HYDRO-AUTHENTICATION';
     const state = getState();
-    const selectedType = state.wallet.get('selectedType');
-    const address = state.wallet.getIn(['accounts', selectedType, 'address']);
-    const connection = connector.getConnection(selectedType);
-    const signature = await connection.personalSignMessage(message);
+    const selectedType = state.WalletReducer.get('selectedType');
+    const address = state.WalletReducer.getIn(['accounts', selectedType, 'address']);
+    const wallet = state.WalletReducer.getIn(['accounts', selectedType, 'wallet']);
+    const signature = await wallet.personalSignMessage(message);
     if (!signature) {
       return;
     }
@@ -108,8 +108,8 @@ export const updateTokenLockedBalances = lockedBalances => {
 export const loadTokens = () => {
   return async (dispatch, getState) => {
     const state = getState();
-    const selectedType = state.wallet.get('selectedType');
-    const accountAddress = state.wallet.getIn(['accounts', selectedType, 'address']);
+    const selectedType = state.WalletReducer.get('selectedType');
+    const accountAddress = state.WalletReducer.getIn(['accounts', selectedType, 'address']);
 
     if (!accountAddress) {
       return;
@@ -155,8 +155,8 @@ export const watchToken = (tokenAddress, symbol) => {
 export const loadToken = (tokenAddress, symbol, decimals) => {
   return async (dispatch, getState) => {
     const state = getState();
-    const selectedType = state.wallet.get('selectedType');
-    const accountAddress = state.wallet.getIn(['accounts', selectedType, 'address']);
+    const selectedType = state.WalletReducer.get('selectedType');
+    const accountAddress = state.WalletReducer.getIn(['accounts', selectedType, 'address']);
     if (!accountAddress) {
       return;
     }

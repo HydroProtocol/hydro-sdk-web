@@ -16,8 +16,8 @@ const mapStateToProps = state => {
   const selector = formValueSelector(TRADE_FORM_ID);
   const bids = state.market.getIn(['orderbook', 'bids']);
   const asks = state.market.getIn(['orderbook', 'asks']);
-  const selectedType = state.wallet.get('selectedType');
-  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
+  const selectedType = state.WalletReducer.get('selectedType');
+  const address = state.WalletReducer.getIn(['accounts', selectedType, 'address']);
 
   return {
     initialValues: {

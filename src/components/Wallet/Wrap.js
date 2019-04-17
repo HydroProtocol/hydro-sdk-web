@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import BigNumber from 'bignumber.js';
-import { wrapETH, unwrapWETH } from '../../lib/connection';
+import { wrapETH, unwrapWETH } from '../../lib/wallet';
 import { toUnitAmount } from '../../lib/utils';
 
 const mapStateToProps = state => {
   const WETH = state.config.get('WETH');
-  const selectedType = state.wallet.get('selectedType');
+  const selectedType = state.WalletReducer.get('selectedType');
   return {
-    ethBalance: toUnitAmount(state.wallet.getIn(['accounts', selectedType, 'balance']), 18),
+    ethBalance: toUnitAmount(state.WalletReducer.getIn(['accounts', selectedType, 'balance']), 18),
     wethBalance: toUnitAmount(state.account.getIn(['tokensInfo', 'WETH', 'balance']) || new BigNumber(0), WETH.decimals)
   };
 };

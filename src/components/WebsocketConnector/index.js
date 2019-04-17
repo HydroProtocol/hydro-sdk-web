@@ -10,8 +10,8 @@ import { tradeUpdate, marketTrade } from '../../actions/trade';
 import { sleep } from '../../lib/utils';
 
 const mapStateToProps = state => {
-  const selectedType = state.wallet.get('selectedType');
-  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
+  const selectedType = state.WalletReducer.get('selectedType');
+  const address = state.WalletReducer.getIn(['accounts', selectedType, 'address']);
   return {
     address,
     currentMarket: state.market.getIn(['markets', 'currentMarket']),

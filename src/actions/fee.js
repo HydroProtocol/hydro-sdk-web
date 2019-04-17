@@ -1,5 +1,5 @@
 import { setConfigs } from './config';
-import { getTokenBalance } from '../lib/connection';
+import { getTokenBalance } from '../lib/wallet';
 import env from '../lib/env';
 
 export let hotDiscountRules = [];

@@ -2,19 +2,18 @@ import React from 'react';
 import { loginRequest, enableMetamask } from '../../actions/account';
 import { updateCurrentMarket } from '../../actions/markets';
 import { connect } from 'react-redux';
-import { Wallet, formatProps } from 'hydro-sdk-wallet';
+import { Wallet, WalletButton } from 'hydro-sdk-wallet';
 import './styles.scss';
 
 const mapStateToProps = state => {
-  const selectedType = state.wallet.get('selectedType');
-  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
+  const selectedType = state.WalletReducer.get('selectedType');
+  const address = state.WalletReducer.getIn(['accounts', selectedType, 'address']);
   return {
-    wallet: state.wallet,
     address,
     isLoggedIn: state.account.getIn(['isLoggedIn', address]),
     currentMarket: state.market.getIn(['markets', 'currentMarket']),
     markets: state.market.getIn(['markets', 'data']),
-    web3NetworkID: state.config.get('web3NetworkID')
+    networkId: state.WalletReducer.getIn(['accounts', selectedType, 'networkId'])
   };
 };
 
@@ -24,7 +23,7 @@ class Header extends React.PureComponent {
   }
 
   render() {
-    const { currentMarket, markets, dispatch, web3NetworkID, wallet } = this.props;
+    const { currentMarket, markets, dispatch, networkId } = this.props;
     return (
       <div className="navbar bg-blue navbar-expand-lg">
         <img className="navbar-brand" src={require('../../images/hydro.svg')} alt="hydro" />
@@ -54,7 +53,7 @@ class Header extends React.PureComponent {
             })}
           </div>
         </div>
-        {web3NetworkID !== 66 && (
+        {networkId !== 66 && (
           <span className="btn text-danger" style={{ marginRight: 12 }}>
             Network Error: Switch Metamask's network to localhost:8545.
           </span>
@@ -67,7 +66,8 @@ class Header extends React.PureComponent {
           style={{ marginRight: 12 }}>
           DOCUMENTATION
         </a>
-        <Wallet {...formatProps(wallet)} />
+        <WalletButton />
+        <Wallet title="Starter Kit Wallet" nodeUrl="http://localhost:8545" />
         {this.renderAccount()}
       </div>
     );

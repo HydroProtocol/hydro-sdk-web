@@ -2,33 +2,24 @@ import BigNumber from 'bignumber.js';
 import { watchToken } from '../actions/account';
 import abi from './abi';
 import env from './env';
-import { connector, get64BytesString } from 'hydro-sdk-wallet';
-
-export { connector };
-
-export const initConnector = dispatch => {
-  connector.setNodeUrl('http://localhost:8545');
-  connector.setDispatch(dispatch);
-};
-
 export let web3, Contract;
 
 export const getTokenBalance = (tokenAddress, accountAddress, getState) => {
   return async (dispatch, getState) => {
-    const selectedType = getState().wallet.get('selectedType');
-    const connection = connector.getConnection(selectedType);
-    const contract = connection.getContract(tokenAddress, abi);
-    const balance = await connection.contractCall(contract, 'balanceOf', accountAddress);
+    const selectedType = getState().WalletReducer.get('selectedType');
+    const wallet = getState().WalletReducer.getIn(['accounts', selectedType, 'wallet']);
+    const contract = wallet.getContract(tokenAddress, abi);
+    const balance = await wallet.contractCall(contract, 'balanceOf', accountAddress);
     return new BigNumber(balance);
   };
 };
 
 export const getAllowance = (tokenAddress, accountAddress) => {
   return async (dispatch, getState) => {
-    const selectedType = getState().wallet.get('selectedType');
-    const connection = connector.getConnection(selectedType);
-    const contract = connection.getContract(tokenAddress, abi);
-    const allowance = await connection.contractCall(contract, 'allowance', accountAddress, env.HYDRO_PROXY_ADDRESS);
+    const selectedType = getState().WalletReducer.get('selectedType');
+    const wallet = getState().WalletReducer.getIn(['accounts', selectedType, 'wallet']);
+    const contract = wallet.getContract(tokenAddress, abi);
+    const allowance = await wallet.contractCall(contract, 'allowance', accountAddress, env.HYDRO_PROXY_ADDRESS);
     return new BigNumber(allowance);
   };
 };
@@ -37,7 +28,7 @@ export const wrapETH = amount => {
   return async (dispatch, getState) => {
     const state = getState();
     const WETH = state.config.get('WETH');
-    const selectedType = state.wallet.get('selectedType');
+    const selectedType = state.WalletReducer.get('selectedType');
     const value = new BigNumber(amount).multipliedBy(Math.pow(10, WETH.decimals)).toString();
 
     let params = {
@@ -49,11 +40,11 @@ export const wrapETH = amount => {
     };
 
     try {
-      const connection = connector.getConnection(selectedType);
-      const transactionID = await connection.sendTransaction(params);
+      const wallet = state.WalletReducer.getIn(['accounts', selectedType, 'wallet']);
+      const transactionID = await wallet.sendTransaction(params);
 
       alert(`Wrap ETH request submitted`);
-      watchTransactionStatus(connection, transactionID, async success => {
+      watchTransactionStatus(wallet, transactionID, async success => {
         if (success) {
           dispatch(watchToken(WETH.address, WETH.symbol));
           alert('Wrap ETH Successfully');
@@ -73,9 +64,9 @@ export const unwrapWETH = amount => {
   return async (dispatch, getState) => {
     const state = getState();
     const WETH = state.config.get('WETH');
-    const selectedType = state.wallet.get('selectedType');
+    const selectedType = state.WalletReducer.get('selectedType');
     const value = new BigNumber(amount).multipliedBy(Math.pow(10, WETH.decimals)).toString(16);
-    const connection = connector.getConnection(selectedType);
+    const wallet = state.WalletReducer.getIn(['accounts', selectedType, 'wallet']);
     const functionSelector = '2e1a7d4d';
     const valueString = get64BytesString(value);
 
@@ -88,10 +79,10 @@ export const unwrapWETH = amount => {
     };
 
     try {
-      const transactionID = await connection.sendTransaction(params);
+      const transactionID = await wallet.sendTransaction(params);
 
       alert(`Unwrap WETH request submitted`);
-      watchTransactionStatus(connection, transactionID, async success => {
+      watchTransactionStatus(wallet, transactionID, async success => {
         if (success) {
           dispatch(watchToken(WETH.address, WETH.symbol));
           alert('Wrap ETH Successfully');
@@ -128,7 +119,7 @@ export const disable = (address, symbol) => {
 export const approve = (tokenAddress, symbol, allowance, action) => {
   return async (dispatch, getState) => {
     const state = getState();
-    const selectedType = state.wallet.get('selectedType');
+    const selectedType = state.WalletReducer.get('selectedType');
     const functionSelector = '095ea7b3';
     let spender = get64BytesString(env.HYDRO_PROXY_ADDRESS);
     if (spender.length !== 64) {
@@ -144,11 +135,11 @@ export const approve = (tokenAddress, symbol, allowance, action) => {
     };
 
     try {
-      const connection = connector.getConnection(selectedType);
-      const transactionID = await connection.sendTransaction(params);
+      const wallet = state.WalletReducer.getIn(['accounts', selectedType, 'wallet']);
+      const transactionID = await wallet.sendTransaction(params);
 
       alert(`${action} ${symbol} request submitted`);
-      watchTransactionStatus(connection, transactionID, async success => {
+      watchTransactionStatus(wallet, transactionID, async success => {
         if (success) {
           dispatch(watchToken(tokenAddress, symbol));
           alert(`${action} ${symbol} Successfully`);
@@ -164,9 +155,9 @@ export const approve = (tokenAddress, symbol, allowance, action) => {
   };
 };
 
-const watchTransactionStatus = (connection, txID, callback) => {
+const watchTransactionStatus = (wallet, txID, callback) => {
   const getTransaction = async () => {
-    const tx = await connection.getTransactionReceipt(txID);
+    const tx = await wallet.getTransactionReceipt(txID);
     if (!tx) {
       window.setTimeout(getTransaction(txID), 3000);
     } else if (callback) {
@@ -176,4 +167,12 @@ const watchTransactionStatus = (connection, txID, callback) => {
     }
   };
   window.setTimeout(getTransaction(txID), 3000);
+};
+
+const get64BytesString = string => {
+  string = string.replace('0x', '');
+  while (string.length < 64) {
+    string = '0'.concat(string);
+  }
+  return string;
 };

@@ -3,17 +3,17 @@ import { connect } from 'react-redux';
 import { loadTokens } from '../../actions/account';
 import { toUnitAmount, isTokenApproved } from '../../lib/utils';
 import BigNumber from 'bignumber.js';
-import { enable, disable } from '../../lib/connection';
+import { enable, disable } from '../../lib/wallet';
 
 const mapStateToProps = state => {
-  const selectedType = state.wallet.get('selectedType');
-  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
+  const selectedType = state.WalletReducer.get('selectedType');
+  const address = state.WalletReducer.getIn(['accounts', selectedType, 'address']);
   return {
     tokensInfo: state.account.get('tokensInfo'),
     address,
     lockedBalances: state.account.get('lockedBalances'),
     isLoggedIn: state.account.getIn(['isLoggedIn', address]),
-    ethBalance: toUnitAmount(state.wallet.getIn(['accounts', selectedType, 'balance']), 18)
+    ethBalance: toUnitAmount(state.WalletReducer.getIn(['accounts', selectedType, 'balance']), 18)
   };
 };
 

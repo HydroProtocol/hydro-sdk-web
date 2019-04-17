@@ -1,4 +1,3 @@
-import { connector } from '../lib/connection';
 import api from '../lib/api';
 
 export const TRADE_FORM_ID = 'TRADE';
@@ -24,7 +23,7 @@ export const trade = (side, price, amount, orderType = 'limit', expires = 86400 
 const createOrder = (side, price, amount, orderType, expires) => {
   return async (dispatch, getState) => {
     const state = getState();
-    const selectedType = state.wallet.get('selectedType');
+    const selectedType = state.WalletReducer.get('selectedType');
     const currentMarket = state.market.getIn(['markets', 'currentMarket']);
 
     const buildOrderResponse = await api.post('/orders/build', {
@@ -43,8 +42,9 @@ const createOrder = (side, price, amount, orderType, expires) => {
     const orderParams = buildOrderResponse.data.data.order;
     const { id: orderID } = orderParams;
     try {
-      const connection = connector.getConnection(selectedType);
-      const signature = await connection.personalSignMessage(orderID);
+      const address = state.WalletReducer.getIn(['accounts', selectedType, 'address']);
+      const wallet = state.WalletReducer.getIn(['accounts', selectedType, 'wallet']);
+      const signature = await wallet.personalSignMessage(orderID, address);
       console.log('order: ', signature);
       const orderSignature = '0x' + signature.slice(130) + '0'.repeat(62) + signature.slice(2, 130);
       const placeOrderResponse = await api.post('/orders', {

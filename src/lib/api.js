@@ -6,8 +6,8 @@ import { logout } from '../actions/account';
 
 const getAxiosInstance = () => {
   const state = store.getState();
-  const selectedType = state.wallet.get('selectedType');
-  const address = state.wallet.getIn(['accounts', selectedType, 'address']);
+  const selectedType = state.WalletReducer.get('selectedType');
+  const address = state.WalletReducer.getIn(['accounts', selectedType, 'address']);
   const hydroAuthentication = loadAccountHydroAuthentication(address);
   let instance;
 

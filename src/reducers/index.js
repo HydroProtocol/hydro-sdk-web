@@ -6,10 +6,10 @@ import config from './config';
 import { WalletReducer } from 'hydro-sdk-wallet';
 
 const rootReducer = combineReducers({
-  wallet: WalletReducer,
   market,
   account,
   config,
-  form: !!formReducer ? formReducer : {}
+  form: !!formReducer ? formReducer : {},
+  WalletReducer
 });
 export default rootReducer;
